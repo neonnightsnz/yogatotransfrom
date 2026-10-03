@@ -1,7 +1,7 @@
-name = "operation80"
+name = "yoga-to-transform"
 compatibility_date = "2024-09-23"
 pages_build_output_dir = "."
 
 [[kv_namespaces]]
-binding = "STATE"
-id = "640b4614c233407dae238df6a995de61"
+binding = "KV_BINDING"
+id = "965860e851774b80a6848a1166a7b3fb"

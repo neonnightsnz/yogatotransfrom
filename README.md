@@ -47,11 +47,11 @@ Daily entries are keyed by date; shopping entries by the Monday of the current w
 
 ```toml
 [[kv_namespaces]]
-binding = "STATE"      # accessed as env.STATE inside the function
+binding = "KV_BINDING" # accessed as env.KV_BINDING inside the function
 id = "862cd0c9..."     # which KV namespace on Cloudflare's infra
 ```
 
-Cloudflare injects the namespace into `env` at deploy time. The function never touches the ID directly — it just calls `env.STATE.get(...)` and `env.STATE.put(...)`.
+Cloudflare injects the namespace into `env` at deploy time. The function never touches the ID directly — it just calls `env.KV_BINDING.get(...)` and `env.KV_BINDING.put(...)`.
 
 ### Request lifecycle
 
@@ -102,21 +102,21 @@ npx wrangler login
 **2. Create the KV namespace**
 
 ```bash
-npx wrangler kv namespace create STATE
+npx wrangler kv namespace create KV_BINDING
 ```
 
 Copy the `id` from the output and update `wrangler.toml`:
 
 ```toml
 [[kv_namespaces]]
-binding = "STATE"
+binding = "KV_BINDING"
 id = "<paste-your-id-here>"
 ```
 
 **3. Create the Pages project (first deploy only)**
 
 ```bash
-npx wrangler pages project create operation-80
+npx wrangler pages project create yoga-to-transform
 ```
 
 **4. Deploy**
@@ -130,7 +130,7 @@ Wrangler prints the deployment URL. On subsequent deploys, skip step 3.
 ### Local development
 
 ```bash
-npx wrangler pages dev . --kv STATE
+npx wrangler pages dev . --kv KV_BINDING
 ```
 
 State writes go to a local `.wrangler/state` directory and do not touch the production KV namespace.

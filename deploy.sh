@@ -20,6 +20,6 @@ else
   [ -z "$BRANCH" ] && echo "Cancelled." && exit 0
 fi
 
-npx wrangler pages deploy . --project-name operation80 --branch "$BRANCH"
+npx wrangler pages deploy . --project-name yoga-to-transform --branch "$BRANCH"
 npx wrangler kv key put --namespace-id=862cd0c9c955470583098512e8c115c1 "app-version" "$HASH" --remote
 echo "Version $HASH written to KV."
