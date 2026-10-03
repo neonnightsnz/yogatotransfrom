@@ -25,7 +25,7 @@ export async function onRequestOptions() {
 export async function onRequestGet({ request, env }) {
   const target = stateKey(request);
   if (target.error) return target.error;
-  const state = await env.STATE.get(target.key, { type: 'json' });
+  const state = await (env.KV_BINDING || env.STATE).get(target.key, { type: 'json' });
   return Response.json(state || {}, { headers: CORS });
 }
 
@@ -38,6 +38,6 @@ export async function onRequestPost({ request, env }) {
   } catch {
     return new Response('Invalid JSON', { status: 400, headers: CORS });
   }
-  await env.STATE.put(target.key, JSON.stringify(body));
+  await (env.KV_BINDING || env.STATE).put(target.key, JSON.stringify(body));
   return new Response('ok', { headers: CORS });
 }
