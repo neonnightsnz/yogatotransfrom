@@ -416,6 +416,7 @@
   }
 
   /* ── sync indicator ────────────────────────────────────── */
+  #daily-targets, .macro-summary, .meal-macros { display: none !important; }
   .sync-dot {
     position: fixed;
     bottom: 18px; right: 18px;
@@ -442,6 +443,7 @@
 </style>
 </head>
 <body>
+<div class="journey-entry" style="max-width:1080px;margin:0 auto;padding:12px 20px;text-align:right"><a href="/journey.html" style="color:var(--green);font-weight:700">Open My Journey</a></div>
 
 <div class="theme-bar" id="theme-bar">
   <div class="theme-bar-top">
@@ -464,7 +466,7 @@
 </div>
 
 <!-- Daily Targets -->
-<div class="card yellow-border">
+<div id="daily-targets" class="card yellow-border">
   <h2>Daily Targets</h2>
   <div class="targets-grid">
     <div class="target-item"><div class="label">Calories</div><div class="value">2 100 kcal</div></div>
