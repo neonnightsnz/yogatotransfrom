@@ -1,3 +1,7 @@
 .wrangler/
 node_modules/
 _version.js
+
+# Keep docs out of deploys and commits except the brand logo
+docs/*
+!docs/Yoga to Transform Logo.png
