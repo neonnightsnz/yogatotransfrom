@@ -59,11 +59,23 @@ a.btn{display:inline-block;text-decoration:none}
 <main id="main"></main>
 </div>
 <script>
-var KEY='y2t-journey-v1',TABS=[['today','Today'],['move','Move'],['timer','Meal window'],['menu','Menu'],['playbook','Playbook'],['journey','Journey']],tab='today';
+var KEY='y2t-journey-v1',PROFILE_KEY='y2t-profile-id',TABS=[['today','Today'],['move','Move'],['timer','Meal window'],['menu','Menu'],['playbook','Playbook'],['journey','Journey']],tab='today';
+var legacyMigrationAllowed=false,profileId=resolveProfileId(),CACHE={},syncReady=false,_syncTimer=null;
+function resolveProfileId(){
+ var valid=/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+ var url=new URL(location.href),id=url.searchParams.get('journey'),stored='';
+ try{stored=localStorage.getItem(PROFILE_KEY)||''}catch(e){}
+ var supplied=valid.test(id||'');legacyMigrationAllowed=!supplied||id===stored;
+ if(!supplied)id=stored;
+ if(!valid.test(id||''))id=crypto.randomUUID();
+ try{localStorage.setItem(PROFILE_KEY,id)}catch(e){}
+ if(url.searchParams.get('journey')!==id){url.searchParams.set('journey',id);history.replaceState(null,'',url.pathname+url.search+url.hash)}
+ return id;
+}
 var ITEMS=['move my body in a way I enjoy','drink water through the day','fill my plate with real food I enjoy','eat sitting down, from a plate, slowly','read or breathe for ten quiet minutes','wind down for a good night\u2019s sleep'];
 var FEEL=['\uD83D\uDE1E','\uD83D\uDE15','\uD83D\uDE42','\uD83D\uDE0A','\uD83E\uDD29'];
 var S={start:null,mode:'get',days:{},fast:{start:null,hrs:12},reframes:[],menu:null,pulls:[],pat:{t:[],h:'',m:[]},worked:[],buddy:null,custom:[]};
-try{var r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+
 var CATS=[['starters','Starters','Quick, a few minutes'],['mains','Mains','An hour or so'],['sides','Sides','Alongside the boring jobs'],['desserts','Desserts','Once in a while. Notice how you feel afterwards'],['specials','Specials','When they\u2019re available to you']];
 var DEF={starters:['Dance to a favourite song','Have a snack','One minute of star jumps','Hug a pet'],mains:['Bake','Paint','Journal','Go for a walk','Do a jigsaw puzzle','Plan a trip'],sides:['Music while I tidy','Listen to a podcast','Light a candle','Audiobook'],desserts:['Scroll social media','Watch TV'],specials:['Book a holiday','Go to a concert','Massage or nails']};
 var FEELINGS=['Tired','Stressed','Bored','Lonely','Sad','Anxious','Frustrated','Celebrating','Not sure'];
@@ -78,7 +90,13 @@ var GD=['Choose tomorrow\u2019s 3 challenges','Pack my gym bag','Put my shoes by
 if(!S.gifts)S.gifts=GD.slice();
 if(!S.menu)S.menu=JSON.parse(JSON.stringify(DEF));
 var PF='',NOTE='',EDIT=false,MSG='';
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function scheduleSync(){
+ clearTimeout(_syncTimer);
+ _syncTimer=setTimeout(async function(){
+  try{await fetch('/api/state?journey='+encodeURIComponent(profileId),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(CACHE)})}catch(e){}
+ },600);
+}
+function save(){if(!syncReady)return;CACHE.y2t=S;scheduleSync()}
 function ds(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function today(){return ds(new Date())}
 function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML}
@@ -178,7 +196,7 @@ function vPlaybook(){
  if(S.worked.length||S.reframes.length)h+='<button class="chip x" id="wed">'+(PE?'Done editing':'Edit or delete notes')+'</button>';
  return h+'</div>'+vReframe();
 }
-var MEALVIDEO=''; /* Paste the video link here when it's ready */
+var MEALVIDEO=''; /* TODO: Add the approved video link when ready. Keep blank until confirmed. */
 function mealExtras(){
  var h='<div class="card"><h3>Watch: how to use your meal window</h3>';
  h+=MEALVIDEO?'<a class="btn" href="'+MEALVIDEO+'" target="_blank" rel="noopener">Watch the video</a>':'<div class="vid"><div class="pl">\u25B6</div><b>Video coming soon</b><span class="sub">A short walk-through from Kristina and Audrie</span></div>';
@@ -204,7 +222,7 @@ function vTimer(){
  return h;
 }
 var CONTACT='https://www.yogatotransform.com/contact-us';
-/* Add real emails and meeting links here. Blank values fall back to the contact page. */
+/* TODO: Add approved email and meeting links only after confirmation. Leave blank to use CONTACT. */
 var TEAM=[{n:'Kristina',email:'',meet:''},{n:'Audrie',email:'',meet:''}];
 function helpCard(){
  var h='<div class="card"><h3>Want a hand? Ask Kristina or Audrie</h3><p class="sub">If a pattern keeps showing up or today feels heavy, you don\u2019t have to work it out alone. Reach out, or book a time to talk it through.</p>';
@@ -248,7 +266,7 @@ function vReframe(){
  return h;
 }
 function vJourney(){
- var n=dayNum(),h='<div class="card"><h2>75-day view</h2>';
+ var n=dayNum(),h='<div class="card"><h2>75-day view</h2><p class="sub">Anyone with your private link can see and update your journey. Keep it private.</p><input type="text" id="private-link" readonly value="'+esc(location.origin+location.pathname+'?journey='+profileId)+'" aria-label="Your private Journey link"><button class="btn o" id="copy-link">Copy my private link</button><p class="sub" id="copy-status" aria-live="polite"></p>';
  if(!S.start)return h+'<p class="sub">Begin your journey on the Today tab and your days will appear here.</p></div>';
  var tot=0,g='';
  for(var i=0;i<75;i++){var d=new Date(S.start+'T00:00');d.setDate(d.getDate()+i);var k=ds(d),c=counted(k);if(c)tot++;g+='<div class="dot'+(c?' d':'')+(i+1===n?' t':'')+'" title="Day '+(i+1)+'"></div>'}
@@ -260,7 +278,8 @@ function vJourney(){
  return h;
 }
 function bind(){
- var q=function(s){return document.querySelector(s)},qa=function(s){return document.querySelectorAll(s)};
+var q=function(s){return document.querySelector(s)},qa=function(s){return document.querySelectorAll(s)};
+ var copyLink=q('#copy-link');if(copyLink)copyLink.onclick=async function(){var input=q('#private-link'),status=q('#copy-status');try{await navigator.clipboard.writeText(input.value);status.textContent='Private link copied.'}catch(e){input.focus();input.select();status.textContent='Select and copy your private link.'}};
  var go=q('#go');if(go)go.onclick=function(){S.start=q('#sd').value||today();save();render()};
  qa('[data-m]').forEach(function(b){b.onclick=function(){S.mode=b.dataset.m;save();render()}});
  qa('[data-i]').forEach(function(b){b.onchange=function(){var d=day(today()),i=+b.dataset.i,p=d.c.indexOf(i);if(p>-1){d.c.splice(p,1);if(d.ac)delete d.ac[i]}else d.c.push(i);PB=-1;save();render()}});
@@ -319,7 +338,18 @@ var TM;function tick(){
  ph.textContent=hrs>=f.hrs?'Your window is open. Eat slowly, from a plate, and notice how it tastes.':hrs<4?'Settling after your last meal.':hrs<8?'Resting and digesting. Water or herbal tea is fine.':'Hunger comes in waves and passes. Notice it without judging it. Eat if you need to.';
  TM=setTimeout(function(){if(tab==='timer')tick()},1000);
 }
-render();
+async function bootJourney(){
+ try{var response=await fetch('/api/state?journey='+encodeURIComponent(profileId));CACHE=response.ok?(await response.json()||{}):{}}catch(e){CACHE={}}
+ var migrated=false;
+ if(CACHE.y2t)S=Object.assign(S,CACHE.y2t);
+ else if(legacyMigrationAllowed){try{var legacy=localStorage.getItem(KEY);if(legacy){S=Object.assign(S,JSON.parse(legacy));CACHE.y2t=S;migrated=true}}catch(e){}}
+ if(!S.pat)S.pat={t:[],h:'',m:[]};
+ if(!S.gifts)S.gifts=GD.slice();
+ if(!S.menu)S.menu=JSON.parse(JSON.stringify(DEF));
+ syncReady=true;render();
+ if(migrated)save();
+}
+bootJourney();
 </script>
 </body>
 </html>
