@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
 <title>Yoga to Transform · Tracker</title>
 <style>
   :root {
@@ -441,6 +444,51 @@
     transition: opacity .2s;
   }
   #version-label:hover { opacity: 1; }
+
+  /* Yoga to Transform visual system */
+  :root {
+    --bg:#FAF6F3; --card:#FFFFFF; --border:#E8DCD9;
+    --accent:#12452F; --accent2:#A64F5C; --green:#12452F;
+    --yellow:#DDB8BC; --teal:#6B3B35; --text:#2A1F1D;
+    --muted:#6B5558; --radius:16px;
+    --forest:#12452F; --cocoa:#6B3B35; --blush:#EDE0E0;
+    --rose:#DDB8BC; --ink:#2A1F1D;
+    --serif:'EB Garamond',Georgia,serif;
+    --sans:'Nunito Sans',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+    color-scheme:light;
+  }
+  body { background:var(--bg); color:var(--ink); font:17px/1.65 var(--sans); max-width:680px; padding:calc(16px + env(safe-area-inset-top,0px)) 18px calc(24px + env(safe-area-inset-bottom,0px)); }
+  h1,h2,h3 { font-family:var(--serif); color:var(--cocoa); }
+  h2 { font-size:1.5rem; font-weight:600; letter-spacing:0; text-transform:none; }
+  .card { background:var(--card); border-color:var(--border); border-radius:16px; padding:20px; }
+  .card.accent-border,.card.green-border { border-left-color:var(--forest); }
+  .card.red-border { border-left-color:var(--accent2); }
+  .card.teal-border { border-left-color:var(--cocoa); }
+  .meal-card,.target-item,.macro-summary { background:var(--blush); }
+  .meal-name,.meal-ingredients li,.checklist li,.shop-list li,.shop-item-name { font-size:1rem; }
+  .meal-ingredients li { color:var(--ink); }
+  .date-info { font-size:.9rem; color:var(--muted); }
+  .date-info strong { color:var(--cocoa); }
+  .theme-bar { background:var(--bg); border-bottom:1px solid var(--border); backdrop-filter:none; }
+  .theme-bar-name { color:var(--cocoa); font:600 1.35rem/1.2 var(--serif); letter-spacing:0; text-transform:none; }
+  .theme-bar-week,.theme-bar-manual { color:var(--muted); font:400 .9rem var(--sans); letter-spacing:0; text-transform:none; }
+  .theme-pill { color:var(--ink); font:700 .9rem var(--sans); letter-spacing:0; text-transform:none; background:var(--card); }
+  .theme-pill:hover { color:var(--forest); border-color:var(--forest); }
+  .section-title,.meal-slot-title,.shop-category-title { color:var(--cocoa); font-size:.95rem; letter-spacing:0; text-transform:none; }
+  .checklist li { padding:11px 0; border-color:var(--border); }
+  .checklist li.done { opacity:.78; color:var(--muted); text-decoration:none; }
+  .progress-bar,.progress-label { display:none; }
+  .shuffle-btn,.shop-reset,.respin-btn { font-family:var(--sans); }
+  .shuffle-btn { background:var(--forest); color:#fff; border-radius:999px; padding:10px 16px; font-size:1rem; }
+  .respin-btn { border-color:var(--border); color:var(--forest); border-radius:999px; }
+  .shop-reset:hover,.respin-btn:hover { color:var(--cocoa); border-color:var(--cocoa); }
+  .shop-list li.got { opacity:.68; text-decoration:none; }
+  .shop-list li input[type=checkbox]:checked,.shop-progress-fill { background:var(--forest); border-color:var(--forest); }
+  .shop-category-title { color:var(--forest); }
+  .shop-note,.tuna-note { color:var(--accent2); }
+  #version-label { font-family:var(--sans); font-size:.8rem; }
+  button:focus-visible,a:focus-visible,input:focus-visible { outline:3px solid var(--accent2); outline-offset:3px; }
+  @media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; transition-duration:.01ms !important; animation-duration:.01ms !important; } }
 </style>
 </head>
 <body>
@@ -478,13 +526,13 @@
   </div>
 </div>
 
-<!-- Weekly Shopping List -->
+<!-- Weekly shopping list -->
 <div class="card teal-border" id="shop-card">
   <div class="shop-header" onclick="toggleShop()">
-    <h2>Weekly Shopping</h2>
+    <h2>This week's shopping list</h2>
     <div class="shop-meta">
       <span class="shop-count" id="shop-count">0 / 0</span>
-      <button class="shop-reset" onclick="resetShop(event)">Reset</button>
+      <button class="shop-reset" onclick="resetShop(event)">Clear checks</button>
       <span class="shop-arrow" id="shop-arrow">▶</span>
     </div>
   </div>
@@ -508,8 +556,8 @@
 <!-- Meal Suggestions -->
 <div class="card red-border">
   <div class="meals-header">
-    <h2 style="margin-bottom:0">Today's Meals</h2>
-    <button class="shuffle-btn" onclick="shuffleAll()">↺ Shuffle All</button>
+    <h2 style="margin-bottom:0">Meal ideas for today</h2>
+    <button class="shuffle-btn" onclick="shuffleAll()">↺ Show me other ideas</button>
   </div>
 
   <div class="meal-slot">
@@ -564,55 +612,55 @@
   </div>
 </div>
 
-<!-- Daily Checklist -->
+<!-- Small choices for today -->
 <div class="card green-border">
-  <h2>Daily Checklist</h2>
+  <h2>Small choices for today</h2>
   <div class="section-group">
     <div class="section-title">Morning</div>
     <ul class="checklist" id="morning-list">
-      <li data-key="m1"><input type="checkbox"> Log weight</li>
-      <li data-key="m2"><input type="checkbox"> 500 ml water on waking</li>
-      <li data-key="m3"><input type="checkbox"> Check today's workout</li>
+      <li data-key="m1"><input type="checkbox"> Take a moment to notice how I feel</li>
+      <li data-key="m2"><input type="checkbox"> Have a glass of water when I wake up</li>
+      <li data-key="m3"><input type="checkbox"> See what movement feels good today</li>
     </ul>
   </div>
   <div class="section-group" style="margin-top:12px">
     <div class="section-title">Nutrition</div>
     <ul class="checklist" id="nutrition-list">
-      <li data-key="n1"><input type="checkbox"> Protein target hit (180 g)</li>
-      <li data-key="n2"><input type="checkbox"> Fiber target hit (40–45 g)</li>
-      <li data-key="n3"><input type="checkbox"> Calories controlled (~2 100)</li>
-      <li data-key="n4"><input type="checkbox"> Water target hit (3 L)</li>
+      <li data-key="n1"><input type="checkbox"> Include a source of protein with a meal</li>
+      <li data-key="n2"><input type="checkbox"> Add a source of fibre if it feels good</li>
+      <li data-key="n3"><input type="checkbox"> Eat something that feels satisfying</li>
+      <li data-key="n4"><input type="checkbox"> Drink water through the day</li>
     </ul>
   </div>
   <div class="section-group" style="margin-top:12px">
     <div class="section-title">Activity</div>
     <ul class="checklist" id="activity-list">
-      <li data-key="a1"><input type="checkbox"> Workout / session completed</li>
-      <li data-key="a2"><input type="checkbox"> Steps completed (8–10 k)</li>
-      <li data-key="a3"><input type="checkbox"> Mobility done</li>
+      <li data-key="a1"><input type="checkbox"> Move in a way that feels right today</li>
+      <li data-key="a2"><input type="checkbox"> Get some fresh air if I can</li>
+      <li data-key="a3"><input type="checkbox"> Stretch or move gently if it feels good</li>
     </ul>
   </div>
   <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-  <div class="progress-label"><span>Day progress</span><span id="progress-text">0 / 10</span></div>
+  <div class="progress-label"><span>Today's check-ins</span><span id="progress-text">0 / 10</span></div>
 </div>
 
 <!-- Weekly review: Sunday only -->
 <div class="card" id="weekly-review-card" style="display:none; border-left: 3px solid var(--yellow)">
-  <h2>Weekly Review</h2>
+  <h2>A gentle weekly check-in</h2>
   <ul class="checklist" id="weekly-list">
-    <li data-key="w1"><input type="checkbox"> Record average weight this week</li>
-    <li data-key="w2"><input type="checkbox"> Measure waist</li>
-    <li data-key="w3"><input type="checkbox"> Front photo</li>
-    <li data-key="w4"><input type="checkbox"> Side photo</li>
-    <li data-key="w5"><input type="checkbox"> Back photo</li>
-    <li data-key="w6"><input type="checkbox"> Note knee condition</li>
-    <li data-key="w7"><input type="checkbox"> Note energy level</li>
-    <li data-key="w8"><input type="checkbox"> Meal prep done</li>
+    <li data-key="w1"><input type="checkbox"> Notice what supported me this week</li>
+    <li data-key="w2"><input type="checkbox"> Notice one thing that gave me energy</li>
+    <li data-key="w3"><input type="checkbox"> Remember a meal I enjoyed</li>
+    <li data-key="w4"><input type="checkbox"> Notice when I felt rested</li>
+    <li data-key="w5"><input type="checkbox"> Remember movement I enjoyed</li>
+    <li data-key="w6"><input type="checkbox"> Notice how my body felt during movement</li>
+    <li data-key="w7"><input type="checkbox"> Notice what helped my energy</li>
+    <li data-key="w8"><input type="checkbox"> Prepare something easy for later</li>
   </ul>
 </div>
 
-<div style="display:flex;justify-content:space-between;align-items:center;font-size:.75rem;color:var(--muted);margin-top:20px;padding-bottom:24px;">
-  <span>Daily checks reset at midnight · Shopping list resets every Monday</span>
+<div style="display:flex;justify-content:space-between;align-items:center;font-size:.9rem;color:var(--muted);margin-top:20px;padding-bottom:24px;">
+  <span>Your check-ins are saved by day. Your shopping list is saved by week.</span>
   <a id="version-label" target="_blank" rel="noopener"></a>
 </div>
 <div class="sync-dot" id="sync-dot"></div>
@@ -628,7 +676,7 @@ const WEEKLY_PLANS = [
   {
     name: "Classic Comfort",
     displayName: "Classic Comfort",
-    color: "#f5c842",
+    color: "#12452F",
     meals: {
       breakfast: [
         { name: "Honey Berry Skyr Bowl", items: ["Skyr / 0% Greek yogurt · 400 g", "Frozen berries · 150 g", "Honey · 15 g", "Oats · 30 g (topping)"], protein: 48, fiber: 11, cal: 540 },
@@ -696,7 +744,7 @@ const WEEKLY_PLANS = [
   {
     name: "Asian-Inspired",
     displayName: "Asian Fusion",
-    color: "#2dd4bf",
+    color: "#12452F",
     meals: {
       breakfast: [
         { name: "Tropical Yogurt Bowl", items: ["Skyr / 0% Greek yogurt · 400 g", "Canned pineapple · 150 g (in juice)", "Oats · 40 g", "Banana · 1"], protein: 49, fiber: 9, cal: 610 },
@@ -761,7 +809,7 @@ const WEEKLY_PLANS = [
   {
     name: "Tex-Mex",
     displayName: "Tex-Mex",
-    color: "#ff6584",
+    color: "#A64F5C",
     meals: {
       breakfast: [
         { name: "Mango Skyr Bowl", items: ["Skyr / 0% Greek yogurt · 400 g", "Mango · 150 g (fresh or frozen)", "Oats · 40 g", "Honey · 10 g"], protein: 47, fiber: 8, cal: 570 },
@@ -829,7 +877,7 @@ const WEEKLY_PLANS = [
   {
     name: "Hearty Comfort",
     displayName: "Hearty Comfort",
-    color: "#4caf82",
+    color: "#6B3B35",
     meals: {
       breakfast: [
         { name: "Cinnamon Apple Oats", items: ["Oats · 80 g", "0% Greek yogurt · 300 g", "Apple · 1 (diced)", "Honey · 15 g", "Cinnamon"], protein: 42, fiber: 11, cal: 670 },
@@ -900,7 +948,7 @@ const WORKOUTS = {
   4: { label: 'Walk + Mobility', items: ['Walk 45–60 min','Hip mobility','Calf mobility','Hamstring mobility'] },
   5: { label: 'Upper Strength B', items: ['Push-up variation — 4 sets','Rows — 4×12','Pike push-ups — 3×10','Chair dips — 3×12','Core circuit'] },
   6: { label: 'Long Walk', items: ['Walk 60–90 min','Optional: swimming / cycling'] },
-  0: { label: 'Rest + Meal Prep', rest: true, items: ['Rest today','Cook 3 kg chicken','Cook 1 kg rice','Roast 3 kg potatoes','Prepare vegetables','Portion meals into containers'] }
+  0: { label: 'Rest + make tomorrow easier', rest: true, items: ['Rest today','Prepare something simple for lunch or dinner','Cook a grain if that would help','Wash or chop something I would like to eat','Make leftovers easy to reach'] }
 };
 
 // ─── Keys ─────────────────────────────────────────────────────
@@ -1017,7 +1065,7 @@ function toggleShop() {
 }
 function resetShop(e) {
   e.stopPropagation();
-  if (!confirm('Reset the shopping list for this week?')) return;
+  if (!confirm('Clear the checked items from this week's list?')) return;
   setShopState({});
   document.querySelectorAll('#shop-body .shop-list li').forEach(li => {
     const cb = li.querySelector('input[type=checkbox]');
