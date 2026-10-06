@@ -39,7 +39,7 @@ nav button[aria-selected=true]{background:var(--forest);border-color:var(--fores
 .seg button[aria-pressed=true]{background:var(--forest);color:var(--on-forest)}
 input[type=text],input[type=date]{width:100%;font:1rem var(--sans);padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);margin:4px 0 12px}
 .msg{background:var(--blush);border-radius:14px;padding:14px 16px;margin:12px 0;color:var(--ink)}
-.grid{display:grid;grid-template-columns:repeat(15,1fr);gap:4px;margin:14px 0}
+.task-progress{margin:12px 0}.task-progress progress{display:block;width:100%;height:12px;margin-top:6px;accent-color:var(--forest)}.grid{display:grid;grid-template-columns:repeat(15,1fr);gap:4px;margin:14px 0}
 .dot{aspect-ratio:1;border-radius:50%;background:var(--blush)}
 .dot.d{background:var(--forest)}.dot.t{outline:2px solid var(--accent);outline-offset:1px}
 .feel button{font-size:1.5rem;background:transparent;border:2px solid transparent;border-radius:12px;padding:4px 8px;cursor:pointer}
@@ -50,7 +50,7 @@ input[type=text],input[type=date]{width:100%;font:1rem var(--sans);padding:12px;
 .hide{display:none}
 .vid{aspect-ratio:16/9;border-radius:14px;background:var(--blush);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px;border:2px dashed var(--rose);color:var(--ink)}
 .vid .pl{width:56px;height:56px;border-radius:50%;background:var(--forest);color:var(--on-forest);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:8px}
-details{border-top:1px solid var(--line);padding:10px 0}summary{cursor:pointer;font-weight:700;color:var(--cocoa)}details p{margin:8px 0 0}
+details{border-top:1px solid var(--line);padding:10px 0}summary{cursor:pointer;font-weight:700;color:var(--cocoa)}details p{margin:8px 0 0}.pb-method{padding:13px 0}.pb-method summary{padding:2px 0}.pb-method summary .sub{font-weight:400;margin-left:6px}
 a.btn{display:inline-block;text-decoration:none}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 .chip{font:700 1rem var(--sans);padding:8px 14px;border-radius:999px;border:1.5px solid var(--forest);background:transparent;color:var(--forest);cursor:pointer;margin:3px 4px 3px 0}
 .chip[aria-pressed=true]{background:var(--forest);color:var(--on-forest)}
@@ -65,7 +65,7 @@ a.btn{display:inline-block;text-decoration:none}button:focus-visible,a:focus-vis
 <main id="main"></main>
 </div>
 <script>
-var KEY='y2t-journey-v1',PROFILE_KEY='y2t-profile-id',TABS=[['today','Today'],['move','Move'],['timer','Meal window'],['menu','Pause & Choose'],['playbook','Playbook'],['journey','Journey']],tab=(function(){var t=new URL(location.href).searchParams.get('tab');return TABS.some(function(x){return x[0]===t})?t:'today'})();
+var KEY='y2t-journey-v1',PROFILE_KEY='y2t-profile-id',TABS=[['today','Today'],['playbook','Playbook'],['move','Move'],['timer','Meal window'],['meals','Meals'],['menu','Pause & Choose'],['journey','Journey']],tab=(function(){var t=new URL(location.href).searchParams.get('tab');return TABS.some(function(x){return x[0]===t})?t:'today'})();
 var legacyMigrationAllowed=false,profileId=resolveProfileId(),CACHE={},syncReady=false,_syncTimer=null;
 function resolveProfileId(){
  var valid=/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -89,8 +89,9 @@ if(!S.pat)S.pat={t:[],h:'',m:[]};
 var CH=['go for a 30-minute walk','do 10 minutes of strength with weights or my body','move for 10 minutes inside','swap one sugary drink for water','drink two litres of water','eat breakfast sitting down, without a screen','eat from a side plate and chew slowly','keep to a 12-hour meal window (see the timer)','add protein and veg to a meal so I feel full','plan a treat to look forward to','put a healthy meal in the freezer for later','read ten pages of a book','stretch and breathe for five minutes','wind down 30 minutes before bed','walk with a friend'];
 var PT=[['fast','I eat too fast'],['bored','I snack when bored'],['skip','I skip meals, then overeat'],['tired','I eat for comfort when tired or stressed'],['evening','I graze in the evening'],['sweet','I have a sweet tooth']];
 var SUG={fast:[6],bored:[9,11,12],skip:[5,8],tired:[13,12],evening:[8,9],sweet:[3,9]};
-var HT=['Morning','Afternoon','Evening','Late night'],MV=['Walking','Dancing','Yoga','Strength','Swimming','Cycling'];
-var PE=false,PB=-1,PICK=[],PICKER_OPEN=false,TPICK=[],TOPEN=false,MW={w:'out',e:'mid'};
+var HT=['Morning','Afternoon','Evening','Late night'],MV=['Walking','Dancing','Yoga','Strength','Swimming','Cycling','Pilates','Hiking','Team sports','Gardening'];
+var PE=false,PB=-1,PICK=[],PICKER_OPEN=false,TPICK=[],TOPEN=false,EDIT_W=-1,MW={w:'out',e:'mid'},PFOPEN=false;
+var PB_SECTIONS={worked:true,patterns:false,session:false,reframe:false};
 var PLAN={out:{low:'A ten-minute stroll round the block. Going counts.',mid:'An easy 20-minute walk. Pick a route you love.',full:'A brisk 30 to 45 minute walk. Add hills, or a backpack with a little weight.'},in:{low:'Five minutes of gentle stretching and slow breathing, or dance to one favourite song.',mid:'Ten minutes: 2 rounds of 10 squats, 10 wall push-ups and 30 seconds of marching on the spot.',full:'Twenty minutes: 3 rounds of 10 squats, 10 wall push-ups, 10 glute bridges and a 20-second plank. Rest when you need to.'}};
 var GD=['Choose tomorrow\u2019s 3 challenges','Pack my gym bag','Put my shoes by the front door','Set an alarm for tomorrow','Pack my lunch for tomorrow','Lay out my yoga gear','Put overnight oats or chia in the fridge','Fill a water bottle'],GE=false;
 if(!S.gifts)S.gifts=GD.slice();
@@ -108,7 +109,7 @@ function niceDate(k){if(!/^\d{4}-\d{2}-\d{2}$/.test(String(k||'')))return'';retu
 function today(){return ds(new Date())}
 function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML}
 function day(k){return S.days[k]||(S.days[k]={c:[],f:0})}
-function challengeSessions(d){var out=(d&&Array.isArray(d.sessions)?d.sessions:[]).slice();if(d&&d.p&&d.p.length)out.push({p:d.p,c:d.c||[],ac:d.ac||{},mode:d.mode||S.mode});return out}
+function challengeSessions(d){var out=(d&&Array.isArray(d.sessions)?d.sessions:[]).slice();if(d&&d.p&&d.p.length)out.push({p:d.p,c:d.c||[],ac:d.ac||{},dayFeel:d.dayFeel||0,mode:d.mode||S.mode});return out}
 function counted(k){var d=S.days[k];return challengeSessions(d).some(function(s){return s.p&&s.p.length&&(s.c||[]).length>=2})}
 function pre(){return S.mode==='get'?'I get to ':'I want to '}
 function render(){
@@ -116,13 +117,13 @@ function render(){
  t.innerHTML=TABS.map(function(x){return '<button role="tab" data-t="'+x[0]+'" aria-selected="'+(tab===x[0])+'">'+x[1]+'</button>'}).join('');
  t.querySelectorAll('button').forEach(function(b){b.onclick=function(){tab=b.dataset.t;render()}});
  var m=document.getElementById('main');
- m.innerHTML=({today:vToday,timer:vTimer,menu:vMenu,move:vMove,playbook:vPlaybook,journey:vJourney})[tab]();
+ m.innerHTML=({today:vToday,timer:vTimer,menu:vMenu,move:vMove,playbook:vPlaybook,journey:vJourney,meals:vMeals})[tab]();
  bind();
 }
 function glowViews(){
  var by={},days=[],h='',all=0;
  for(var i=13;i>=0;i--){var dd=new Date();dd.setDate(dd.getDate()-i);var d=S.days[ds(dd)],ratings=[];
-  challengeSessions(d).forEach(function(session){Object.keys(session.ac||{}).forEach(function(j){var r=session.ac[j];if(r&&session.c&&session.c.indexOf(+j)>-1){ratings.push(r);var t=session.p[+j];if(t)(by[t]=by[t]||[]).push(r);all++}})});
+  challengeSessions(d).forEach(function(session){if(session.dayFeel){ratings.push(session.dayFeel);all++}Object.keys(session.ac||{}).forEach(function(j){var r=session.ac[j];if(r&&session.c&&session.c.indexOf(+j)>-1){ratings.push(r);var t=session.p[+j];if(t)(by[t]=by[t]||[]).push(r);all++}})});
   days.push(ratings.length?ratings.reduce(function(a,b){return a+b},0)/ratings.length:0)}
  if(days.filter(Boolean).length>=3){
   h+='<h3 style="margin-top:16px">Afterglow notes, last 14 days</h3><svg viewBox="0 0 140 44" width="100%" role="img" aria-label="Optional afterglow ratings over the last 14 days">';
@@ -181,41 +182,62 @@ function vToday(){
   }
  }else{
   h+='<h3>My choices for today</h3>';
-  d.p.forEach(function(it,i){var on=d.c.indexOf(i)>-1;h+='<label class="tick'+(on?' done':'')+'"><input type="checkbox" data-i="'+i+'"'+(on?' checked':'')+'><span>'+pre()+esc(it)+'</span></label>';
-   if(on){var ac=(d.ac||{})[i];h+='<div style="padding-left:36px"><div class="sub">How did that feel?</div><div class="feel">'+FEEL.map(function(f,r){return '<button data-ac="'+i+'-'+(r+1)+'" aria-pressed="'+(ac===r+1)+'" aria-label="Afterglow '+(r+1)+' of 5">'+f+'</button>'}).join('')+'</div>';
-    if(PB===i)h+='<div class="msg">That felt good. Add it to your Playbook so you remember?<br><button class="chip" data-pbadd="'+i+'">Add to my Playbook</button><button class="chip x" data-pbx="1">Not now</button></div>';
-    h+='</div>'}});
-  var c=d.c.length;
-  h+='<div class="msg">'+(c>=2?'You tried at least two of your three chosen challenges. That counts as a challenge day. Anything else is optional.':c===1?'You tried one challenge. Two of your three is enough for a counted challenge day. Anything else is optional.':'Start with whichever feels useful, or leave it here.')+'</div><button class="chip x" id="ch">Change today\u2019s choices</button>';
+  var c=d.c.length,total=d.p.length;
+  h+='<div class="task-progress"><div class="sub" id="task-progress-label">'+c+' of '+total+' choices completed</div><progress id="task-progress" max="'+total+'" value="'+c+'" aria-label="Today’s choices completed"></progress></div>';
+  d.p.forEach(function(it,i){var on=d.c.indexOf(i)>-1;h+='<label class="tick'+(on?' done':'')+'"><input type="checkbox" data-i="'+i+'"'+(on?' checked':'')+'><span>'+pre()+esc(it)+'</span></label>'});
+  if(c>=total){h+='<div class="msg">You completed your choices. Anything else is optional.</div><div class="sub">How do you feel now? (optional)</div><div class="feel">'+FEEL.map(function(f,r){return '<button data-dayfeel="'+(r+1)+'" aria-pressed="'+(d.dayFeel===r+1)+'" aria-label="How I feel now, option '+(r+1)+' of 5">'+f+'</button>'}).join('')+'</div>'}
+  else h+='<div class="msg">Choose any that feel useful. There is no need to finish all three.</div>'; h+='<button class="chip x" id="ch">Change today\u2019s choices</button>';
  }
  h+='</div>'+thanks()+welcome();
  if(S.buddy)h+='<div class="card"><h3>Walk with '+esc(S.buddy.n||'my buddy')+'</h3><p>'+esc(S.buddy.w)+'</p>'+(S.buddy.solo?'<p class="sub">If they can\u2019t make it, I\u2019m going anyway.</p>':'')+'</div>';
- h+='<details class="card"><summary>Would it help to check in with myself?</summary><p class="sub">You can note how you feel, or skip this completely.</p><div class="feel">'+FEEL.map(function(f,i){return '<button data-f="'+(i+1)+'" aria-pressed="'+(d.f===i+1)+'" aria-label="Feeling '+(i+1)+' of 5">'+f+'</button>'}).join('')+'</div></details>';
+ h+='<details class="card"><summary>Would it help to check in with yourself?</summary><p class="sub">You can note how you feel, or skip this completely.</p><div class="feel">'+FEEL.map(function(f,i){return '<button data-f="'+(i+1)+'" aria-pressed="'+(d.f===i+1)+'" aria-label="Feeling '+(i+1)+' of 5">'+f+'</button>'}).join('')+'</div></details>';
  h+='<div class="card"><h3>Feeling a pull toward food?</h3><p class="sub">Pause for a moment. You can notice what is going on without judgement.</p><button class="btn o" data-go="menu">Open Pause &amp; Choose</button></div>';
  h+=giftCard();
  return h;
 }
+function planFor(){
+ var p=PLAN[MW.w][MW.e];
+ if(MW.w==='in'&&MW.e!=='low'&&S.pat.m.length){
+  if(S.pat.m.indexOf('Yoga')>-1)p='Twenty minutes of gentle yoga at home. A video is fine; rest whenever you need to.';
+  else if(S.pat.m.indexOf('Strength')>-1)p='Twenty minutes of strength: 3 rounds of 10 squats, 10 wall push-ups and a 20-second plank. Rest when you need to.';
+  else if(S.pat.m.indexOf('Dancing')>-1)p='Twenty minutes of dancing to your favourite songs. Nobody is watching.';
+ }
+ if(MW.w==='out'&&MW.e!=='low'&&S.pat.m.indexOf('Cycling')>-1)p='A relaxed 20 to 30 minute bike ride. Pick a route you enjoy, and go at chat pace.';
+ if(MW.w==='out'&&MW.e==='low'&&S.pat.m.indexOf('Walking')>-1)p='A ten-minute stroll round the block. Going counts.';
+ if(MW.w==='in'&&MW.e!=='low'&&S.pat.m.indexOf('Pilates')>-1)p='A short Pilates session at your pace. A mat and a few moves are enough.';
+ if(MW.w==='out'&&MW.e==='full'&&S.pat.m.indexOf('Hiking')>-1)p='Choose a local track and go at a pace that feels good. Turn back whenever you like.';
+ if(MW.e!=='low'&&S.pat.m.indexOf('Gardening')>-1)p='Spend 15 minutes gardening: potter, weed or water, and take breaks when you want.';
+ if(MW.w==='out'&&MW.e==='full'&&S.pat.m.indexOf('Team sports')>-1)p='Choose a social game or team sport and play for as long as feels good.';
+ return p;
+}
 function vMove(){
- var h='<div class="card"><h2>Move my way</h2><p class="sub">'+(S.pat.m.length?'You enjoy '+S.pat.m.join(', ').toLowerCase()+'. ':'')+'Pick where you are and how much energy you\u2019ve got. There\u2019s always a version that counts.</p><h3>Where?</h3><div class="seg row"><button data-w="out" aria-pressed="'+(MW.w==='out')+'">Outside</button><button data-w="in" aria-pressed="'+(MW.w==='in')+'">Inside (rain or no time)</button></div><h3 style="margin-top:14px">Energy?</h3><div class="seg row"><button data-e="low" aria-pressed="'+(MW.e==='low')+'">Low</button><button data-e="mid" aria-pressed="'+(MW.e==='mid')+'">Okay</button><button data-e="full" aria-pressed="'+(MW.e==='full')+'">Full</button></div><div class="msg">'+PLAN[MW.w][MW.e]+'</div><p class="sub">Discomfort is okay. Pain is information. Stop if something is sharp or you feel dizzy.</p></div>';
- var b=S.buddy||{n:'',w:'',solo:true};
+ var h='<div class="card"><h2>Move my way</h2><p class="sub">'+(S.pat.m.length?'You enjoy '+S.pat.m.join(', ').toLowerCase()+', so some suggestions use that. ':'')+'Pick where you are and how much energy you\u2019ve got. There\u2019s always a version that counts.</p><h3>Where?</h3><div class="seg row"><button data-w="out" aria-pressed="'+(MW.w==='out')+'">Outside</button><button data-w="in" aria-pressed="'+(MW.w==='in')+'">Inside (rain or no time)</button></div><h3 style="margin-top:14px">Energy?</h3><div class="seg row"><button data-e="low" aria-pressed="'+(MW.e==='low')+'">Low</button><button data-e="mid" aria-pressed="'+(MW.e==='mid')+'">Okay</button><button data-e="full" aria-pressed="'+(MW.e==='full')+'">Full</button></div><div class="msg">'+planFor()+'</div><p class="sub">Discomfort is okay. Pain is information. Stop if something is sharp or you feel dizzy.</p></div>';
+ var ideas=MW.w==='out'?(MW.e==='low'?['A gentle wander somewhere green','Walk one block and turn back','Stretch outside for five minutes']:MW.e==='mid'?['Try a new neighbourhood route','Walk and talk with someone','Take an easy bike ride']:['Explore a local trail','Play a social sport','Go for a longer bike ride']):(MW.e==='low'?['Stretch to one favourite song','Try a few gentle yoga moves','Walk around the house']:MW.e==='mid'?['Try a short Pilates flow','Dance to three favourite songs','Do a gentle strength circuit']:['Follow a short dance workout','Try a bodyweight circuit','Put on a short cardio video']);
+ h+='<div class="card"><h3 style="margin-top:14px">A few other ideas</h3><p class="sub">Pick one that sounds good, change it to suit you, or skip it.</p><ul>'+ideas.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>'; var b=S.buddy||{n:'',w:'',solo:true};
  h+='<div class="card"><h2>Walking buddy</h2><p class="sub">Plans with another person are easier to keep. Decide now what happens if they cancel.</p><label class="sub" for="bn">Who?</label><input type="text" id="bn" maxlength="40" value="'+esc(b.n)+'" placeholder="A friend, Mum, a neighbour"><label class="sub" for="bw">When and where?</label><input type="text" id="bw" maxlength="80" value="'+esc(b.w)+'" placeholder="Saturday 8am, lake loop"><label class="tick"><input type="checkbox" id="bs"'+(b.solo?' checked':'')+'><span>If they can\u2019t make it, I\u2019ll go anyway</span></label><button class="btn" id="bsv">Save plan</button><button class="btn o" id="bsd">Send invite</button><div class="sub" id="bm"></div></div>';
  return h;
 }
 function vPlaybook(){
- var h='<div class="card"><h2>My patterns</h2><p class="sub">Everyone\u2019s different. Tell the app about you and it will suggest challenges to match.</p><h3>I tend to\u2026</h3><div>';
+ var h='<div class="card"><h2>What worked last time</h2><p class="sub">Start with anything that helped, even a little. Keep a note to come back to when it feels useful.</p>';
+ h+='<details class="pb-method" data-pb="worked"'+(PB_SECTIONS.worked?' open':'')+'><summary>Add something that worked</summary><label class="sub" for="wk">What helped me?</label><input type="text" id="wk" maxlength="140" placeholder="e.g. Celery and egg lunch kept me full" aria-label="What worked"><button class="btn" id="wks">Save note</button></details>';
+ if(S.worked.length){h+='<h3 style="margin-top:16px">Notes I have kept</h3>';S.worked.forEach(function(x,i){
+  if(PE&&EDIT_W===i)h+='<div class="out"><input type="text" id="wed-input" maxlength="140" value="'+esc(x)+'" aria-label="Edit note"><button class="chip" id="wed-save" aria-label="Save note">Save</button> <button class="chip x" id="wed-cancel" aria-label="Cancel editing">Cancel</button></div>';
+  else h+='<div class="out">'+esc(x)+(PE?' <button class="chip x" data-wd="'+i+'" aria-label="Delete note">Delete</button> <button class="chip" data-we="'+i+'" aria-label="Edit note">Edit</button>':'')+'</div>';
+ });}
+ if(S.worked.length||S.reframes.length)h+='<button class="chip x" id="wed">'+(PE?'Done editing':'Edit or delete notes')+'</button>';
+ h+='</div><div class="card"><h2>Other ways to keep a learning</h2><p class="sub">Choose whichever feels right. You can use one, several, or none.</p>';
+ h+='<details class="pb-method" data-pb="patterns"'+(PB_SECTIONS.patterns?' open':'')+'><summary>My patterns <span class="sub">Quick picklists</span></summary><p class="sub">These choices can help the app suggest challenges that fit you.</p><h3>I tend to…</h3><div>';
  PT.forEach(function(x){h+='<button class="chip" data-pt="'+x[0]+'" aria-pressed="'+(S.pat.t.indexOf(x[0])>-1)+'">'+x[1]+'</button>'});
  h+='</div><h3 style="margin-top:12px">The trickiest time of day</h3><div>';
  HT.forEach(function(x){h+='<button class="chip" data-ph="'+x+'" aria-pressed="'+(S.pat.h===x)+'">'+x+'</button>'});
  h+='</div><h3 style="margin-top:12px">Movement I enjoy</h3><div>';
  MV.forEach(function(x){h+='<button class="chip" data-pm="'+x+'" aria-pressed="'+(S.pat.m.indexOf(x)>-1)+'">'+x+'</button>'});
- h+='</div></div><div class="card"><h2>Session learnings</h2><p class="sub">After a conversation with Kristina, keep a pattern or learning that feels useful. Add it in your own words. This is yours to choose; nothing here becomes a task.</p><label class="sub" for="sl-learning">What did we talk about that I want to remember?</label><textarea id="sl-learning" maxlength="500" rows="3" style="width:100%;font:1rem var(--sans);padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);margin:4px 0 12px"></textarea><label class="sub" for="sl-note">What do I want to remember for myself? (optional)</label><textarea id="sl-note" maxlength="500" rows="2" style="width:100%;font:1rem var(--sans);padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);margin:4px 0 12px"></textarea><button class="btn" id="sl-save">Save to my Playbook</button>';
+ h+='</div></details>';
+ h+='<details class="pb-method" data-pb="session"'+(PB_SECTIONS.session?' open':'')+'><summary>Session learnings</summary><p class="sub">After a conversation with Kristina, keep a thought in your own words. Nothing here becomes a task.</p><label class="sub" for="sl-learning">What do I want to remember from our conversation?</label><textarea id="sl-learning" maxlength="500" rows="3" style="width:100%;font:1rem var(--sans);padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);margin:4px 0 12px"></textarea><label class="sub" for="sl-note">A note to myself (optional)</label><textarea id="sl-note" maxlength="500" rows="2" style="width:100%;font:1rem var(--sans);padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);margin:4px 0 12px"></textarea><button class="btn" id="sl-save">Save learning</button>';
  (S.sessionLearnings||[]).forEach(function(x){h+='<div class="log"><b>'+esc(niceDate(x.date))+'</b><p>'+esc(x.learning||'')+'</p>'+(x.remember?'<p class="sub">'+esc(x.remember)+'</p>':'')+'</div>'});
- h+='</div><div class="card"><h2>What worked last time</h2><p class="sub">Keep a note you can return to whenever it feels useful.</p><input type="text" id="wk" maxlength="140" placeholder="e.g. Celery and egg lunch kept me full" aria-label="What worked"><button class="btn" id="wks">Add to my Playbook</button>';
- S.worked.forEach(function(x,i){h+='<div class="out">'+esc(x)+(PE?' <button class="chip x" data-wd="'+i+'" aria-label="Delete note">Delete</button>':'')+'</div>'});
- if(S.worked.length||S.reframes.length)h+='<button class="chip x" id="wed">'+(PE?'Done editing':'Edit or delete notes')+'</button>';
- return h+'</div>'+vReframe();
-}
-var MEALVIDEO=''; /* TODO: Add the approved video link when ready. Keep blank until confirmed. */
+ h+='</details><details class="pb-method" data-pb="reframe"'+(PB_SECTIONS.reframe?' open':'')+'><summary>From “I should” to “I get to”</summary>'+vReframe()+'</details></div>';
+ return h;
+}var MEALVIDEO=''; /* TODO: Add the approved video link when ready. Keep blank until confirmed. */
 function mealExtras(){
  var h='<div class="card"><h3>Watch: how to use your meal window</h3>';
  h+=MEALVIDEO?'<a class="btn" href="'+MEALVIDEO+'" target="_blank" rel="noopener">Watch the video</a>':'<div class="vid"><div class="pl">\u25B6</div><b>Video coming soon</b><span class="sub">A short walk-through from Kristina</span></div>';
@@ -253,42 +275,44 @@ function helpCard(){
  return h;
 }
 function vMenu(){
- var h='<div class="card"><h2>Pause &amp; Choose</h2><h3>When I feel the pull</h3><p class="sub">Reaching for food when we\u2019re feeling something is human. Noticing it is the skill. No guilt needed: notice, choose, and learn. Each time you spot an old pattern, you get another chance to choose differently.</p><h3>What am I feeling?</h3><div>';
- FEELINGS.forEach(function(f){h+='<button class="chip" data-pf="'+f+'" aria-pressed="'+(PF===f)+'">'+f+'</button>'});
- h+='</div><label class="sub" for="pn" style="display:block;margin-top:12px">What did I notice, or what might I try next time? (optional)</label><input type="text" id="pn" maxlength="140" value="'+esc(NOTE)+'"></div>';
- if(MSG)h+='<div class="msg">'+MSG+'</div>';
+ var h='<div class="card"><h2>Pause &amp; Choose</h2><h3>When I feel the pull</h3><p class="sub">Reaching for food when we’re feeling something is human. Noticing it is the skill. No guilt needed: notice, choose, and learn. Each time you spot an old pattern, you get another chance to choose differently.</div>';
+ if(MSG)h+='<div class="msg">'+esc(MSG)+'</div>';
  CATS.forEach(function(c){
   h+='<div class="card"><h3>'+c[1]+'</h3><p class="sub">'+c[2]+'</p><div>';
-  S.menu[c[0]].forEach(function(it,j){h+='<button class="chip'+(EDIT?' x':'')+'" data-c="'+c[0]+'" data-j="'+j+'">'+esc(it)+(EDIT?' \u00D7':'')+'</button>'});
+  S.menu[c[0]].forEach(function(it,j){h+='<button class="chip'+(EDIT?' x':'')+'" data-c="'+c[0]+'" data-j="'+j+'">'+esc(it)+(EDIT?' ×':'')+'</button>'});
   h+='</div><div class="add"><input type="text" data-add="'+c[0]+'" placeholder="Add your own" maxlength="50" aria-label="Add to '+c[1]+'"><button class="chip" data-addb="'+c[0]+'">Add</button></div></div>';
  });
- h+='<div class="card"><p>Ate for comfort anyway? That\u2019s okay. Logging it is how you spot the pattern.</p><button class="btn o" id="ate">I ate for comfort, and that\u2019s okay</button> <button class="btn o" id="ed">'+(EDIT?'Done editing choices':'Edit my choices')+'</button></div>';
+ h+='<details class="card" id="feeling-note"'+(PFOPEN?' open':'')+'><summary>Would naming what I feel help?</summary><p class="sub">This is just a pause to help you choose. You do not need to record anything.</p><div>';
+ FEELINGS.forEach(function(f){h+='<button class="chip" data-pf="'+f+'" aria-pressed="'+(PF===f)+'">'+f+'</button>'});
+ h+='</div></details>';
+ h+='<div class="card"><label class="sub" for="pn">What did I notice, or what might I try next time? (optional)</label><input type="text" id="pn" maxlength="140" value="'+esc(NOTE)+'" placeholder="A thought for next time"><button class="btn o" id="add-note">Add note</button></div>';
+ h+='<div class="card"><p>Ate for comfort anyway? That’s okay. You can notice it without judgement.</p><button class="btn o" id="ate">I ate for comfort, and that’s okay</button> <button class="btn o" id="ed">'+(EDIT?'Done editing choices':'Edit my choices')+'</button></div>';
  h+=helpCard();
  var P=S.pulls;
  if(P.length){
   var ch=P.filter(function(x){return x.ty==='chose'}).length,cnt={};P.forEach(function(x){cnt[x.f]=(cnt[x.f]||0)+1});
   var top=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]})[0];
-  h+='<div class="card"><h3>What I\u2019m noticing</h3><p class="sub">'+P.length+' moments noticed. '+ch+' times I chose something from Pause & Choose.'+(P.length>=3?' Most common feeling: '+esc(top.toLowerCase())+'.':'')+'</p>';
-  P.slice(0,5).forEach(function(x){h+='<div class="log"><b>'+esc(x.f)+'</b> \u2192 '+(x.ty==='chose'?'chose: '+esc(x.c):'ate for comfort, and noticed it')+(x.n?'<br><span class="sub">'+esc(x.n)+'</span>':'')+'</div>'});
+  h+='<div class="card"><h3>What I’m noticing</h3><p class="sub">'+P.length+' moments noticed. '+ch+' times I chose something from Pause &amp; Choose.'+(P.length>=3?' Most common feeling: '+esc(top.toLowerCase())+'.':'')+'</p>';
+  P.slice(0,5).forEach(function(x){h+='<div class="log"><b>'+esc(x.f)+'</b> → '+(x.ty==='chose'?'chose: '+esc(x.c):x.ty==='note'?'note: '+esc(x.n):'ate for comfort, and noticed it')+(x.n&&x.ty!=='note'?'<br><span class="sub">'+esc(x.n)+'</span>':'')+'</div>'});
   h+='</div>';
  }
  return h;
-}
-function logPull(ty,c){S.pulls.unshift({d:today(),f:PF||'Not sure',ty:ty,c:c||'',n:NOTE});S.pulls=S.pulls.slice(0,60);
- MSG=ty==='chose'?'Nice choosing. You\u2019re building a new pattern.':'Thanks for noticing. That\u2019s the skill, not a failure. What might you try next time?';
- PF='';NOTE='';save();render()}
-function vReframe(){
- var h='<div class="card"><h2>From \u201CI should\u201D to \u201CI get to\u201D</h2><p class="sub">\u201CShould\u201D carries pressure and guilt. \u201CGet to\u201D and \u201Cwant to\u201D point at what you\u2019re choosing and why.</p>';
+}function logPull(ty,c){
+ S.pulls.unshift({d:today(),f:PF||'Not sure',ty:ty,c:c||'',n:NOTE});S.pulls=S.pulls.slice(0,60);
+ MSG=ty==='chose'?'Nice choosing. You’re building a new pattern.':ty==='note'?'Note added to what you’re noticing.':'Thanks for noticing. You can decide what feels helpful next.';
+ PF='';NOTE='';PFOPEN=false;save();render()
+}function vReframe(){
+ var h='<p class="sub">Turn a pressured thought into a choice that matters to you.</p>';
  h+='<label class="sub" for="r1">Something I feel I should do</label><input type="text" id="r1" placeholder="go for a walk" maxlength="80"><label class="sub" for="r2">Why it matters to me</label><input type="text" id="r2" placeholder="it clears my head" maxlength="100">';
- h+='<div id="ro"></div><button class="btn" id="rs">Save my reframe</button></div>';
- if(S.reframes.length){h+='<h3>My reframes</h3>';S.reframes.slice(0,8).forEach(function(x,i){h+='<div class="out">'+esc(x)+(PE?' <button class="chip x" data-rd="'+i+'" aria-label="Delete reframe">Delete</button>':'')+'</div>'})}
+ h+='<div id="ro"></div><button class="btn" id="rs">Save reframe</button>';
+ if(S.reframes.length){h+='<h3 style="margin-top:14px">My reframes</h3>';S.reframes.slice(0,8).forEach(function(x,i){h+='<div class="out">'+esc(x)+(PE?' <button class="chip x" data-rd="'+i+'" aria-label="Delete reframe">Delete</button>':'')+'</div>'})}
  return h;
 }
 function vJourney(){
  var h='<div class="card"><h2>Journey progress</h2><p class="sub">Anyone with your private link can see and update your Journey. Keep it private.</p><input type="text" id="private-link" readonly value="'+esc(location.origin+location.pathname+'?journey='+profileId)+'" aria-label="Your private Journey link"><button class="btn o" id="copy-link">Copy my private link</button><p class="sub" id="copy-status" aria-live="polite"></p>';
  var keys=Object.keys(S.days||{}).sort(),tot=0,tr={},ga=[],rows=[];
  keys.forEach(function(k){var d=S.days[k],sessions=challengeSessions(d),dayCounted=counted(k);if(dayCounted)tot++;
-  sessions.forEach(function(session){var tried=[];session.p.forEach(function(x,i){if(session.c&&session.c.indexOf(i)>-1){tr[x]=1;tried.push({name:x,feel:session.ac&&session.ac[i]||0});if(session.ac&&session.ac[i])ga.push(session.ac[i])}});
+  sessions.forEach(function(session){if(session.dayFeel)ga.push(session.dayFeel);var tried=[];session.p.forEach(function(x,i){if(session.c&&session.c.indexOf(i)>-1){tr[x]=1;tried.push({name:x,feel:session.ac&&session.ac[i]||0});if(session.ac&&session.ac[i])ga.push(session.ac[i])}});
    if(tried.length)rows.push({date:k,tried:tried,mode:session.mode||S.mode})});
  });
  h+='<div class="row" style="gap:28px;margin-top:12px">';
@@ -303,13 +327,143 @@ function vJourney(){
  h+='<div class="card"><h2>Your data, your choice</h2><p class="sub">Everything in your Journey is yours. You can download a copy any time, or erase it completely from this private link. Erasing cannot be undone.</p><button class="btn o" id="export-data">Download a copy of my data</button> <button class="btn o" id="erase1">Erase everything</button><div id="erase-confirm"></div></div>';
  return h;
 }
+// ---------------- Meals: recipes, favourites and the week plan ----------------
+var M={view:'ideas',detail:null,idea:null,ideaOk:true,searchQ:'',results:null,resultsOk:true,busy:false,cache:[]};
+if(!S.meals)S.meals={favourites:[],picks:[],shopDay:'',prepDay:'',style:'batch',exclusions:[],checked:[]};
+if(!S.meals.favourites)S.meals.favourites=[];if(!S.meals.picks)S.meals.picks=[];if(!S.meals.exclusions)S.meals.exclusions=[];if(!S.meals.checked)S.meals.checked=[];
+function api(path){return fetch(path).then(function(r){return r.json()})}
+function mealById(id){return api('/api/recipes/meal?q='+encodeURIComponent(id)).then(function(d){return d&&d.meals&&d.meals[0]||null})}
+// meal ingredients as [{name, measure}] from a lookup record
+function mealIngredients(m){var out=[];for(var i=1;i<=20;i++){var n=(m['strIngredient'+i]||'').trim(),ms=(m['strMeasure'+i]||'').trim();if(n)out.push({name:n,measure:ms})}return out}
+// exclusion matching: a single-word term matches an ingredient whose name is
+// exactly that word or ends with it ('sugar' excludes 'caster sugar' but not
+// 'sugar snap peas'); a multi-word term matches only from the start of the name
+function ingredientExcluded(name){
+ var words=name.toLowerCase().replace(/[^a-z ]/g,' ').split(/\s+/).filter(Boolean);
+ return S.meals.exclusions.some(function(ex){var e=ex.toLowerCase().replace(/[^a-z ]/g,' ').split(/\s+/).filter(Boolean);
+  if(!e.length||!words.length)return false;
+  if(e.length===1)return words.length===1?words[0]===e[0]:words[words.length-1]===e[0];
+  return e.length<=words.length&&e.every(function(w,i){return words[i]===w});
+ });
+}
+function excludedIngredientsOf(m){return mealIngredients(m).filter(function(x){return ingredientExcluded(x.name)})}
+function excludedList(){return S.meals.exclusions.join(', ')}
+function vMeals(){
+ var h='<div class="card"><h2>Meals, if you want them</h2><p class="sub">Recipe ideas from TheMealDB, a favourites shelf, and an optional plan for the week. Everything here is optional; skipping it changes nothing else.</p></div>';
+ h+='<div class="card"><div class="row"><button class="chip" data-mv="ideas" aria-pressed="'+(M.view==='ideas')+'">Today\u2019s idea</button><button class="chip" data-mv="search" aria-pressed="'+(M.view==='search')+'">Find recipes</button><button class="chip" data-mv="plan" aria-pressed="'+(M.view==='plan')+'">My week</button></div></div>';
+ if(M.view==='ideas')return h+vMealsIdeas();
+ if(M.view==='search')return h+vMealsSearch();
+ return h+vMealsPlan();
+}
+function recipeCard(m,extra){
+ var h='<div class="card"><h3>'+esc(m.strMeal)+'</h3><p class="sub">'+esc(m.strArea||'')+(m.strArea&&m.strCategory?' \u00B7 ':'')+esc(m.strCategory||'')+'</p>';
+ if(m.strMealThumb)h+='<img src="'+esc(m.strMealThumb)+'" alt="" style="width:100%;border-radius:12px;margin:8px 0">';
+ h+='<div class="row"><button class="btn o" data-recipe="'+m.idMeal+'">Open recipe</button>';
+ var fav=S.meals.favourites.indexOf(m.idMeal)>-1;
+ h+='<button class="chip" data-fav="'+m.idMeal+'" aria-pressed="'+fav+'">'+(fav?'\u2605 In my favourites':'\u2606 Save to favourites')+'</button>';
+ var picked=S.meals.picks.indexOf(m.idMeal)>-1;
+ if(!picked&&S.meals.picks.length<4)h+='<button class="chip x" data-pick="'+m.idMeal+'">Add to my week</button>';
+ else if(picked)h+='<span class="sub">In my week</span>';
+ h+='</div>'+(extra||'');
+ return h+'</div>';
+}
+function vMealsIdeas(){
+ var h='';
+ if(M.busy)h+='<div class="card"><p class="sub">Looking for an idea\u2026</p></div>';
+ else if(M.ideaOk===false)h+='<div class="card"><p>Recipes are not available right now. Please try again later.</p></div>';
+ else if(M.idea)h+=recipeCard(M.idea,'<p class="sub">Not this one? See another idea.</p>');
+ if(!M.busy)h+='<div class="card"><button class="btn" id="idea-new">Show me another idea</button>'+(M.idea?'':'<p class="sub">A random recipe from TheMealDB to browse if you feel like cooking.</p>')+'</div>';
+ if(M.detail)return h+recipeDetail();
+ return h;
+}
+function vMealsSearch(){
+ var h='<div class="card"><h3>Find a recipe</h3><div class="add"><input type="text" id="msq" maxlength="60" value="'+esc(M.searchQ)+'" placeholder="Search by name, e.g. soup" aria-label="Search recipes by name"><button class="chip" id="msb">Search</button></div>';
+ if(M.busy)h+='<p class="sub">Searching\u2026</p>';
+ else if(M.resultsOk===false)h+='<p>Recipes are not available right now. Please try again later.</p>';
+ else if(M.results&&!M.results.length)h+='<p class="sub">Nothing found for \u201C'+esc(M.searchQ)+'\u201D. Try another word.</p>';
+ h+='</div>';
+ if(M.detail)return h+recipeDetail();
+ if(M.results&&M.results.length)h+=M.results.map(function(m){return recipeCard(m)}).join('');
+ return h;
+}
+function vMealsPlan(){
+ var h='<div class="card"><h3>My week</h3><p class="sub">Choose up to four recipes for the week. Four cooked meals give you roughly two meals a day; breakfast can be as simple as you like. Nothing here is compulsory.</p>';
+ if(!S.meals.picks.length)h+='<p class="sub">No recipes in the plan yet. Save favourites or search, then \u201CAdd to my week\u201D.</p>';
+ else h+=S.meals.picks.map(function(id,idx){var fav=M.cache.find(function(m){return m.idMeal===id});
+  return '<div class="out">'+(fav?esc(fav.strMeal):'Recipe '+esc(id))+' <button class="chip x" data-unpick="'+idx+'" aria-label="Remove from week">Remove</button></div>'}).join('');
+ h+='</div>';
+ h+='<div class="card"><h3>Shopping and prep days</h3><p class="sub">Two different days, so the heavy work does not pile onto one afternoon.</p><label class="sub" for="shopday">My shopping day</label><input type="text" id="shopday" maxlength="40" value="'+esc(S.meals.shopDay)+'" placeholder="Saturday morning"><label class="sub" for="prepday">My prep or cooking day</label><input type="text" id="prepday" maxlength="40" value="'+esc(S.meals.prepDay)+'" placeholder="Sunday afternoon"></div>';
+ h+='<div class="card"><h3>How do I want to cook?</h3><div class="seg row"><button data-style="batch" aria-pressed="'+(S.meals.style==='batch')+'">Batch cook on prep day</button><button data-style="fresh" aria-pressed="'+(S.meals.style==='fresh')+'">Cook during the week</button></div>';
+ h+=S.meals.style==='batch'?'<div class="msg">Batch cooking: about two and a half hours on your prep day, including the shop. Cook the recipes, then eat from the fridge or freezer during the week.</div>':'<div class="msg">Fresh cooking: the shop is done once; the meals are cooked on the day you eat them.</div>';
+ h+='</div>';
+ h+='<div class="card"><h3>Ingredients to leave out</h3><p class="sub">Anything listed here is filtered out of the shopping list and flagged on a recipe. Your choices \u2014 nothing is filtered unless you add it.</p><div class="add"><input type="text" id="ex-add" maxlength="40" placeholder="e.g. mushrooms" aria-label="Ingredient to leave out"><button class="chip" id="ex-addb">Add</button></div>';
+ if(S.meals.exclusions.length)h+='<div>' + S.meals.exclusions.map(function(x,i){return '<button class="chip x" data-ex="'+i+'" aria-label="Remove '+esc(x)+' from exclusions">'+esc(x)+' \u00D7</button>'}).join('')+'</div>';
+ h+='<p class="sub">Matching looks at whole ingredient names, so \u201Csugar\u201D will not exclude \u201Csugar snap peas\u201D.</p></div>';
+ h+='<div class="card"><h3>Master shopping list</h3>';
+ if(!S.meals.picks.length)h+='<p class="sub">Add recipes to your week and the ingredients gather here.</p>';
+ else{
+  var anyEx=S.meals.picks.some(function(id){var m=M.cache.find(function(c){return c.idMeal===id});return m&&excludedIngredientsOf(m).length});
+  if(anyEx)h+='<p class="sub">Recipes marked \u2020 contain an ingredient you asked to leave out \u2014 check the recipe before you shop.</p>';
+  h+=S.meals.picks.map(function(id){var m=M.cache.find(function(c){return c.idMeal===id});
+   if(!m)return '<p class="sub">Recipe '+esc(id)+' \u2014 open it once to load its ingredients.</p>';
+   var ex=excludedIngredientsOf(m),d='';
+   d+='<details><summary>'+esc(m.strMeal)+(ex.length?' \u2020':'')+'</summary><p class="sub">'+(ex.length?'Contains: '+esc(ex.map(function(x){return x.name}).join(', ')):'')+'</p>';
+   mealIngredients(m).forEach(function(x){if(ingredientExcluded(x.name))return;var key=id+'|'+x.name;var on=S.meals.checked.indexOf(key)>-1;
+    d+='<label class="tick"><input type="checkbox" data-ck="'+esc(key)+'"'+(on?' checked':'')+'><span>'+esc(x.name)+(x.measure?' \u2014 '+esc(x.measure):'')+'</span></label>'});
+   return d+'</details>'}).join('');
+  var allIds=S.meals.picks.join(',');
+  h+=allIds?'<button class="chip x" id="ck-clear">Uncheck all</button>':'';
+ }
+ h+='</div>';
+ if(M.detail)return h+recipeDetail();
+ return h;
+}
+function recipeDetail(){
+ var m=M.detail,ex=excludedIngredientsOf(m);
+ var h='<div class="card"><h2>'+esc(m.strMeal)+'</h2><p class="sub">'+esc(m.strArea||'')+(m.strArea&&m.strCategory?' \u00B7 ':'')+esc(m.strCategory||'')+'</p>';
+ if(m.strMealThumb)h+='<img src="'+esc(m.strMealThumb)+'" alt="" style="width:100%;border-radius:12px;margin:8px 0">';
+ h+='<div class="row"><button class="chip" data-fav="'+m.idMeal+'" aria-pressed="'+(S.meals.favourites.indexOf(m.idMeal)>-1)+'">'+(S.meals.favourites.indexOf(m.idMeal)>-1?'\u2605 In my favourites':'\u2606 Save to favourites')+'</button>';
+ if(S.meals.picks.indexOf(m.idMeal)<0&&S.meals.picks.length<4)h+='<button class="chip x" data-pick="'+m.idMeal+'">Add to my week</button>';
+ h+='</div>';
+ if(ex.length)h+='<div class="msg">Heads up: this recipe contains '+esc(ex.map(function(x){return x.name}).join(', '))+', which you asked to leave out.</div>';
+ h+='<h3 style="margin-top:12px">Ingredients</h3>';mealIngredients(m).forEach(function(x){h+='<div class="'+(ingredientExcluded(x.name)?'log':'out')+'"'+(ingredientExcluded(x.name)?' style="opacity:.5"':'')+'>'+esc(x.name)+(x.measure?' \u2014 '+esc(x.measure):'')+(ingredientExcluded(x.name)?' <span class="sub">(you leave this out)</span>':'')+'</div>'});
+ h+='<h3 style="margin-top:12px">Method</h3>';
+ String(m.strInstructions||'').split(/\r?\n/).filter(function(p){return p.trim()}).forEach(function(p){h+='<p>'+esc(p.trim())+'</p>'});
+ if(m.strSource)h+='<p class="sub"><a href="'+esc(m.strSource)+'" target="_blank" rel="noopener">Original recipe source</a></p>';
+ h+='<button class="btn o" id="md-close">Back</button></div>';
+ return h;
+}
+function bindMeals(q,qa){
+ qa('[data-mv]').forEach(function(b){b.onclick=function(){M.view=b.dataset.mv;M.detail=null;render()}});
+ var ideaNew=q('#idea-new');if(ideaNew)ideaNew.onclick=async function(){M.busy=true;render();try{var d=await api('/api/recipes/random');M.idea=d&&d.meals&&d.meals[0]||null;M.ideaOk=!!M.idea}catch(e){M.ideaOk=false}M.busy=false;render()};
+ var msb=q('#msb');if(msb)msb.onclick=async function(){M.searchQ=q('#msq').value.trim();if(!M.searchQ)return;M.busy=true;M.detail=null;render();try{var d=await api('/api/recipes/search?q='+encodeURIComponent(M.searchQ));M.results=d&&d.meals||[];M.resultsOk=true}catch(e){M.resultsOk=false;M.results=null}M.busy=false;render()};
+ q('#msq')&& (q('#msq').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();msb&&msb.click()}});
+ qa('[data-recipe]').forEach(function(b){b.onclick=async function(){M.busy=true;render();try{M.detail=await mealById(b.dataset.recipe);if(M.detail&&!M.cache.some(function(c){return c.idMeal===b.dataset.recipe})){M.cache.push(M.detail);if(M.cache.length>40)M.cache=M.cache.slice(-40)}}catch(e){M.detail=null}M.busy=false;render();window.scrollTo(0,0)}});
+ qa('[data-fav]').forEach(function(b){b.onclick=function(){var id=b.dataset.fav,i=S.meals.favourites.indexOf(id);i>-1?S.meals.favourites.splice(i,1):S.meals.favourites.push(id);save();render()}});
+ qa('[data-pick]').forEach(function(b){b.onclick=function(){if(S.meals.picks.length>=4||S.meals.picks.indexOf(b.dataset.pick)>-1)return;S.meals.picks.push(b.dataset.pick);save();render()}});
+ qa('[data-unpick]').forEach(function(b){b.onclick=function(){S.meals.picks.splice(+b.dataset.unpick,1);save();render()}});
+ var sd=q('#shopday'),pd=q('#prepday');
+ if(sd)sd.onchange=function(){S.meals.shopDay=sd.value;save()};
+ if(pd)pd.onchange=function(){S.meals.prepDay=pd.value;save()};
+ qa('[data-style]').forEach(function(b){b.onclick=function(){S.meals.style=b.dataset.style;save();render()}});
+ var exb=q('#ex-addb');if(exb)exb.onclick=function(){var v=q('#ex-add').value.trim();if(!v)return;if(S.meals.exclusions.some(function(x){return x.toLowerCase()===v.toLowerCase()}))return;S.meals.exclusions.push(v);save();render()};
+ q('#ex-add')&&(q('#ex-add').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();exb&&exb.click()}});
+ qa('[data-ex]').forEach(function(b){b.onclick=function(){S.meals.exclusions.splice(+b.dataset.ex,1);save();render()}});
+ qa('[data-ck]').forEach(function(b){b.onchange=function(){var k=b.dataset.ck,i=S.meals.checked.indexOf(k);i>-1?S.meals.checked.splice(i,1):S.meals.checked.push(k);save();render()}});
+ var ckc=q('#ck-clear');if(ckc)ckc.onclick=function(){S.meals.checked=[];save();render()};
+ var mdc=q('#md-close');if(mdc)mdc.onclick=function(){M.detail=null;render();window.scrollTo(0,0)};
+}
 function bind(){
 var q=function(s){return document.querySelector(s)},qa=function(s){return document.querySelectorAll(s)};
- var copyLink=q('#copy-link');if(copyLink)copyLink.onclick=async function(){var input=q('#private-link'),status=q('#copy-status');try{await navigator.clipboard.writeText(input.value);status.textContent='Private link copied.'}catch(e){input.focus();input.select();status.textContent='Select and copy your private link.'}};
+ bindMeals(q,qa);
+ q("#feeling-note")&&q("#feeling-note").addEventListener("toggle",function(){PFOPEN=q("#feeling-note").open});
+ qa("details[data-pb]").forEach(function(d){d.addEventListener("toggle",function(){PB_SECTIONS[d.dataset.pb]=d.open})});
+  var copyLink=q('#copy-link');if(copyLink)copyLink.onclick=async function(){var input=q('#private-link'),status=q('#copy-status');try{await navigator.clipboard.writeText(input.value);status.textContent='Private link copied.'}catch(e){input.focus();input.select();status.textContent='Select and copy your private link.'}};
  var opener=q('#challenge-open');if(opener)opener.onclick=function(){PICKER_OPEN=true;PICK=[];render()};
  var cancel=q('#challenge-cancel');if(cancel)cancel.onclick=function(){PICKER_OPEN=false;PICK=[];render()};
  var roll=q('#roll');if(roll)roll.onclick=function(){var pool=CH.concat(S.custom).slice(),picked=[];while(picked.length<3&&pool.length){picked.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0])}PICK=picked;render()}; qa('[data-m]').forEach(function(b){b.onclick=function(){S.mode=b.dataset.m;save();render()}});
  qa('[data-i]').forEach(function(b){b.onchange=function(){var d=day(today()),i=+b.dataset.i,p=d.c.indexOf(i);if(p>-1){d.c.splice(p,1);if(d.ac)delete d.ac[i]}else d.c.push(i);PB=-1;save();render()}});
+ qa('[data-dayfeel]').forEach(function(b){b.onclick=function(){var d=day(today());d.dayFeel=+b.dataset.dayfeel;save();render()}});
  qa('[data-f]').forEach(function(b){b.onclick=function(){var d=day(today());d.f=d.f===+b.dataset.f?0:+b.dataset.f;save();render()}});
  qa('[data-h]').forEach(function(b){b.onclick=function(){S.fast.hrs=+b.dataset.h;save();render()}});
  var fs=q('#fs');if(fs)fs.onclick=function(){S.fast.start=Date.now();save();render()};
@@ -317,28 +471,28 @@ var q=function(s){return document.querySelector(s)},qa=function(s){return docume
  var fp=q('#fp');if(fp)fp.onclick=function(){S.fast.start=null;save();render()};
  var r1=q('#r1');
  if(r1){var up=function(){var a=r1.value.trim(),b=q('#r2').value.trim();q('#ro').innerHTML=a?'<div class="out">I get to '+esc(a)+'.</div><div class="out">I want to '+esc(a)+(b?', because '+esc(b):'')+'.</div>':''};r1.oninput=up;q('#r2').oninput=up;
-  q('#rs').onclick=function(){var a=r1.value.trim(),b=q('#r2').value.trim();if(!a)return;S.reframes.unshift('I want to '+a+(b?', because '+b:'')+'.');save();render()}}
+  q('#rs').onclick=function(){var a=r1.value.trim(),b=q('#r2').value.trim();if(!a)return;S.reframes.unshift('I want to '+a+(b?', because '+b:'')+'.');PB_SECTIONS.reframe=false;save();render()}}
  qa('[data-go]').forEach(function(b){b.onclick=function(){tab=b.dataset.go;render();window.scrollTo(0,0)}});
- qa('[data-pf]').forEach(function(b){b.onclick=function(){PF=PF===b.dataset.pf?'':b.dataset.pf;MSG='';render()}});
- var pn=q('#pn');if(pn)pn.oninput=function(){NOTE=pn.value};
+ qa('[data-pf]').forEach(function(b){b.onclick=function(){PF=PF===b.dataset.pf?'':b.dataset.pf;PFOPEN=true;MSG='';render()}});
+ var pn=q('#pn');if(pn)pn.oninput=function(){NOTE=pn.value}; var an=q('#add-note');if(an)an.onclick=function(){if(!NOTE.trim()){if(pn)pn.focus();return}logPull('note','')};
  qa('[data-c]').forEach(function(b){b.onclick=function(){var c=b.dataset.c,j=+b.dataset.j;if(EDIT){S.menu[c].splice(j,1);save();render()}else logPull('chose',S.menu[c][j])}});
  qa('[data-addb]').forEach(function(b){b.onclick=function(){var c=b.dataset.addb,i=q('[data-add="'+c+'"]'),v=i.value.trim();if(v){S.menu[c].push(v);save();render()}}});
  var at=q('#ate');if(at)at.onclick=function(){logPull('ate','')};
  var ed=q('#ed');if(ed)ed.onclick=function(){EDIT=!EDIT;render()};
  qa('[data-p]').forEach(function(b){b.onclick=function(){var c=CH.concat(S.custom)[+b.dataset.p],i=PICK.indexOf(c);if(i>-1)PICK.splice(i,1);else if(PICK.length<3)PICK.push(c);render()}});
- var st=q('#st');if(st)st.onclick=function(){if(PICK.length===3){var d=day(today());d.sessions=d.sessions||[];if(d.p&&d.p.length)d.sessions.push({p:d.p.slice(),c:(d.c||[]).slice(),ac:Object.assign({},d.ac||{}),mode:d.mode||S.mode});d.p=PICK.slice();d.mode=S.mode;d.c=[];d.ac={};PICK=[];PICKER_OPEN=false;save();render()}};
+ var st=q('#st');if(st)st.onclick=function(){if(PICK.length===3){var d=day(today());d.sessions=d.sessions||[];if(d.p&&d.p.length)d.sessions.push({p:d.p.slice(),c:(d.c||[]).slice(),ac:Object.assign({},d.ac||{}),dayFeel:d.dayFeel||0,mode:d.mode||S.mode});d.p=PICK.slice();d.mode=S.mode;d.c=[];d.ac={};d.dayFeel=0;PICK=[];PICKER_OPEN=false;save();render()}};
  var topen=q('#topen');if(topen)topen.onclick=function(){TOPEN=true;TPICK=[];render()};
  var tclose=q('#tclose');if(tclose)tclose.onclick=function(){TOPEN=false;TPICK=[];render()};
  qa('[data-p2]').forEach(function(b){b.onclick=function(){var c=CH.concat(S.custom)[+b.dataset.p2],i=TPICK.indexOf(c);if(i>-1)TPICK.splice(i,1);else if(TPICK.length<3)TPICK.push(c);render()}});
  var roll2=q('#roll2');if(roll2)roll2.onclick=function(){var pool=CH.concat(S.custom).slice(),picked=[];while(picked.length<3&&pool.length){picked.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0])}TPICK=picked;render()};
- var tsave=q('#tsave');if(tsave)tsave.onclick=function(){if(TPICK.length===3){var td=day(tomorrow());if(td.p&&td.p.length){td.sessions=td.sessions||[];td.sessions.push({p:td.p.slice(),c:(td.c||[]).slice(),ac:Object.assign({},td.ac||{}),mode:td.mode||S.mode})}td.p=TPICK.slice();td.mode=S.mode;td.c=[];td.ac={};TOPEN=false;TPICK=[];save();render()}};
+ var tsave=q('#tsave');if(tsave)tsave.onclick=function(){if(TPICK.length===3){var td=day(tomorrow());if(td.p&&td.p.length){td.sessions=td.sessions||[];td.sessions.push({p:td.p.slice(),c:(td.c||[]).slice(),ac:Object.assign({},td.ac||{}),dayFeel:td.dayFeel||0,mode:td.mode||S.mode})}td.p=TPICK.slice();td.mode=S.mode;td.c=[];td.ac={};td.dayFeel=0;TOPEN=false;TPICK=[];save();render()}};
  var ex=q('#export-data');if(ex)ex.onclick=function(){var blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='my-journey-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)};
  var e1=q('#erase1');if(e1)e1.onclick=function(){q('#erase-confirm').innerHTML='<div class="msg">This erases everything stored under your private link, for you and anyone you shared it with. Nothing resets later \u2014 it is gone for good.<br><button class="btn" id="erase2">Yes, erase everything</button> <button class="chip x" id="erase-no">Keep my Journey</button></div>';
   q('#erase-no').onclick=function(){render()};
   q('#erase2').onclick=async function(){try{await fetch('/api/state?journey='+encodeURIComponent(profileId),{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})}catch(e){}
-   try{localStorage.removeItem(KEY)}catch(err){}S={start:null,mode:'get',days:{},fast:{start:null,hrs:12},reframes:[],menu:JSON.parse(JSON.stringify(DEF)),pulls:[],pat:{t:[],h:'',m:[]},worked:[],sessionLearnings:[],buddy:null,custom:[],gifts:GD.slice()};CACHE={y2t:S};TOPEN=false;TPICK=[];render()};
+   try{localStorage.removeItem(KEY)}catch(err){}S={start:null,mode:'get',days:{},fast:{start:null,hrs:12},reframes:[],menu:JSON.parse(JSON.stringify(DEF)),pulls:[],pat:{t:[],h:'',m:[]},worked:[],sessionLearnings:[],buddy:null,custom:[],gifts:GD.slice()};CACHE={y2t:S};TOPEN=false;TPICK=[];S.meals={favourites:[],picks:[],shopDay:'',prepDay:'',style:'batch',exclusions:[],checked:[]};M.view='ideas';M.detail=null;M.idea=null;M.results=null;M.cache=[];render()};
   q('#erase2').focus()};
- var chb=q('#ch');if(chb)chb.onclick=function(){var d=day(today());d.sessions=d.sessions||[];d.sessions.push({p:(d.p||[]).slice(),c:(d.c||[]).slice(),ac:Object.assign({},d.ac||{}),mode:d.mode||S.mode});PICK=(d.p||[]).slice();d.p=[];d.c=[];d.ac={};PICKER_OPEN=true;save();render()};
+ var chb=q('#ch');if(chb)chb.onclick=function(){var d=day(today());d.sessions=d.sessions||[];d.sessions.push({p:(d.p||[]).slice(),c:(d.c||[]).slice(),ac:Object.assign({},d.ac||{}),dayFeel:d.dayFeel||0,mode:d.mode||S.mode});PICK=(d.p||[]).slice();d.p=[];d.c=[];d.ac={};d.dayFeel=0;PICKER_OPEN=true;save();render()};
  var cub=q('#cub');if(cub)cub.onclick=function(){var v=q('#cu').value.trim();if(v){S.custom.push(v);save();render()}};
  qa('[data-a]').forEach(function(b){b.onclick=function(){var d=day(today());d.a=d.a===+b.dataset.a?0:+b.dataset.a;save();render()}});
  qa('[data-w]').forEach(function(b){b.onclick=function(){MW.w=b.dataset.w;render()}});
@@ -347,13 +501,13 @@ var q=function(s){return document.querySelector(s)},qa=function(s){return docume
  qa('[data-pt]').forEach(function(b){b.onclick=function(){tg(S.pat.t,b.dataset.pt)}});
  qa('[data-pm]').forEach(function(b){b.onclick=function(){tg(S.pat.m,b.dataset.pm)}});
  qa('[data-ph]').forEach(function(b){b.onclick=function(){S.pat.h=S.pat.h===b.dataset.ph?'':b.dataset.ph;save();render()}});
- var wks=q('#wks');if(wks)wks.onclick=function(){var v=q('#wk').value.trim();if(v){S.worked.unshift(v);save();render()}};
- var slsave=q('#sl-save');if(slsave)slsave.onclick=function(){var learning=q('#sl-learning').value.trim(),remember=q('#sl-note').value.trim();if(!learning)return;S.sessionLearnings=S.sessionLearnings||[];S.sessionLearnings.unshift({date:today(),learning:learning,remember:remember});save();render()}; var bsv=q('#bsv');
+ var wks=q('#wks');if(wks)wks.onclick=function(){var v=q('#wk').value.trim();if(v){S.worked.unshift(v);PB_SECTIONS.worked=false;save();render()}};
+ var slsave=q('#sl-save');if(slsave)slsave.onclick=function(){var learning=q('#sl-learning').value.trim(),remember=q('#sl-note').value.trim();if(!learning)return;S.sessionLearnings=S.sessionLearnings||[];S.sessionLearnings.unshift({date:today(),learning:learning,remember:remember});PB_SECTIONS.session=false;save();render()}; var bsv=q('#bsv');
  if(bsv){var rd=function(){return{n:q('#bn').value.trim(),w:q('#bw').value.trim(),solo:q('#bs').checked}};
   bsv.onclick=function(){var b=rd();if(!b.w){q('#bm').textContent='Add when and where first.';return}S.buddy=b;save();q('#bm').textContent='Saved. It will show on your Today tab.'};
   q('#bsd').onclick=function(){var b=rd(),t='Fancy a walk'+(b.w?' \u2013 '+b.w:'')+'? No pressure if you can\u2019t make it.';
    if(navigator.share){navigator.share({text:t}).catch(function(){})}else if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){q('#bm').textContent='Invite copied. Paste it into a message.'},function(){q('#bm').textContent=t})}else q('#bm').textContent=t}}
- qa('[data-gi]').forEach(function(b){b.onchange=function(){var d=day(today()),x=S.gifts[+b.dataset.gi],i=(d.g=d.g||[]).indexOf(x);i>-1?d.g.splice(i,1):d.g.push(x);save();render()}});
+ qa('[data-gi]').forEach(function(b){b.onchange=function(){var d=day(today()),x=S.gifts[+b.dataset.gi],i=(d.g=d.g||[]).indexOf(x);if(i>-1){d.g.splice(i,1);if(/tomorrow/i.test(x)){TOPEN=false;TPICK=[]}}else{d.g.push(x);if(/choose tomorrow/i.test(x)){TOPEN=true;TPICK=[]}}save();render()}});
  qa('[data-gx]').forEach(function(b){b.onclick=function(){S.gifts.splice(+b.dataset.gx,1);save();render()}});
  var gab=q('#gab');if(gab)gab.onclick=function(){var v=q('#ga').value.trim();if(v){S.gifts.push(v);save();render()}};
  var ged=q('#gedit');if(ged)ged.onclick=function(){GE=!GE;render()};
@@ -362,7 +516,10 @@ var q=function(s){return document.querySelector(s)},qa=function(s){return docume
  qa('[data-pbx]').forEach(function(b){b.onclick=function(){PB=-1;render()}});
  qa('[data-wd]').forEach(function(b){b.onclick=function(){S.worked.splice(+b.dataset.wd,1);save();render()}});
  qa('[data-rd]').forEach(function(b){b.onclick=function(){S.reframes.splice(+b.dataset.rd,1);save();render()}});
- var wed=q('#wed');if(wed)wed.onclick=function(){PE=!PE;render()};
+ var wed=q('#wed');if(wed)wed.onclick=function(){PE=!PE;EDIT_W=-1;render()};
+ qa('[data-we]').forEach(function(b){b.onclick=function(){EDIT_W=+b.dataset.we;render();var inp=q('#wed-input');if(inp){inp.focus();inp.select()}}});
+ var wes=q('#wed-save');if(wes)wes.onclick=function(){var v=q('#wed-input').value.trim();if(v)S.worked[EDIT_W]=v;EDIT_W=-1;save();render()};
+ var wec=q('#wed-cancel');if(wec)wec.onclick=function(){EDIT_W=-1;render()};
  tick();
 }
 var TM;function tick(){

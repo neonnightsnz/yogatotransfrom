@@ -8,10 +8,11 @@ A light, supportive coaching companion hosted on Cloudflare Pages. The home page
 - “I get to / I want to” wording, a dice option for choosing challenges, and a record of positive challenge history.
 - A Pause & Choose section for noticing food-related urges without judgement.
 - Move and Meal window support, including the existing safety guidance and the 12, 13 and 14-hour options.
+- An optional Meals tab: a daily recipe idea and search from TheMealDB (via a server-side Pages Function), favourites, a four-recipe week plan with shopping and prep days, a batch-cook or fresh-cook choice, a master shopping list, and person-managed ingredient exclusions. Nothing here is required and nothing resets.
 - A client-owned Playbook for patterns, reframes, and session learnings the client chooses to write down in their own words.
 - A private Journey link that a client can share with their coach. Anyone holding the link can view and update that Journey.
 
-Recipe discovery, shopping lists, weight and body measurements, and progress photos are outside this app’s current scope. The root overview shows Journey activity, not calories, body measurements or meal completion.
+Recipe discovery uses TheMealDB behind `functions/api/recipes/[action].js` (search, random, lookup and by-ingredient only, with input validation and a 502 fallback message). The API key is read from `THEMEALDB_API_KEY` in the local `.env` or the Pages environment; never embed it in client code. Weight and body measurements, and progress photos, are outside this app’s scope. The root overview shows Journey activity, not calories, body measurements or meal completion.
 
 ## Architecture
 

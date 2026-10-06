@@ -29,5 +29,5 @@ A record of chosen challenges and Playbook learnings, without missed-day or fail
 _Avoid_: streak, score
 
 **Meal ideas and shopping list**:
-Recipe discovery, meal planning and shopping lists are outside the current app’s scope.
-_Avoid_: meal tracking
+Recipe discovery, meal planning and shopping lists are now part of the app as an optional feature (Meals tab), powered by TheMealDB. They are never required and never tracked as tasks.
+_Avoid_: meal tracking, required meal plan
