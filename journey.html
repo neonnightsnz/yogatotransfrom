@@ -90,7 +90,7 @@ var CH=['go for a 30-minute walk','do 10 minutes of strength with weights or my 
 var PT=[['fast','I eat too fast'],['bored','I snack when bored'],['skip','I skip meals, then overeat'],['tired','I eat for comfort when tired or stressed'],['evening','I graze in the evening'],['sweet','I have a sweet tooth']];
 var SUG={fast:[6],bored:[9,11,12],skip:[5,8],tired:[13,12],evening:[8,9],sweet:[3,9]};
 var HT=['Morning','Afternoon','Evening','Late night'],MV=['Walking','Dancing','Yoga','Strength','Swimming','Cycling'];
-var PE=false,PB=-1,PICK=[],PICKER_OPEN=false,MW={w:'out',e:'mid'};
+var PE=false,PB=-1,PICK=[],PICKER_OPEN=false,TPICK=[],TOPEN=false,MW={w:'out',e:'mid'};
 var PLAN={out:{low:'A ten-minute stroll round the block. Going counts.',mid:'An easy 20-minute walk. Pick a route you love.',full:'A brisk 30 to 45 minute walk. Add hills, or a backpack with a little weight.'},in:{low:'Five minutes of gentle stretching and slow breathing, or dance to one favourite song.',mid:'Ten minutes: 2 rounds of 10 squats, 10 wall push-ups and 30 seconds of marching on the spot.',full:'Twenty minutes: 3 rounds of 10 squats, 10 wall push-ups, 10 glute bridges and a 20-second plank. Rest when you need to.'}};
 var GD=['Choose tomorrow\u2019s 3 challenges','Pack my gym bag','Put my shoes by the front door','Set an alarm for tomorrow','Pack my lunch for tomorrow','Lay out my yoga gear','Put overnight oats or chia in the fridge','Fill a water bottle'],GE=false;
 if(!S.gifts)S.gifts=GD.slice();
@@ -143,18 +143,29 @@ function welcome(){
  S.worked.slice(0,3).forEach(function(x){h+='<div class="out">'+esc(x)+'</div>'});
  return h+'<button class="btn o" data-go="playbook">Open my Playbook</button></div>';
 }
+function tomorrow(){var d=new Date();d.setDate(d.getDate()+1);return ds(d)}
 function yest(){var d=new Date();d.setDate(d.getDate()-1);return ds(d)}
 function thanks(){var y=S.days[yest()];if(!y||!y.g||!y.g.length)return'';
  return '<div class="card"><h3>Thanks, past you</h3><p class="sub">Last night you left yourself a few gifts:</p>'+y.g.map(function(x){return '<div class="out">'+esc(x)+'</div>'}).join('')+'</div>'}
 function giftCard(){
- if(new Date().getHours()<16)return'';
+ if(new Date().getHours()<16&&!TOPEN)return'';
  var d=day(today());d.g=d.g||[];
  var h='<div class="card"><h3>Leave a gift for tomorrow</h3><p class="sub">Small things tonight make tomorrow easier. These are optional and don\u2019t count toward your 3.</p>';
  if(GE){S.gifts.forEach(function(x,i){h+='<button class="chip x" data-gx="'+i+'">'+esc(x)+' \u00D7</button>'});
   h+='<div class="add"><input type="text" id="ga" maxlength="60" placeholder="Add my own gift" aria-label="Add my own gift"><button class="chip" id="gab">Add</button></div>'}
  else S.gifts.forEach(function(x,i){var on=d.g.indexOf(x)>-1;h+='<label class="tick'+(on?' done':'')+'"><input type="checkbox" data-gi="'+i+'"'+(on?' checked':'')+'><span>'+esc(x)+'</span></label>'});
  if(!GE&&d.g.length)h+='<div class="msg">Lovely. Tomorrow-you says thanks.</div>';
- return h+'<button class="chip x" id="gedit">'+(GE?'Done editing':'Edit my gifts')+'</button></div>';
+ h+='<button class="chip x" id="gedit">'+(GE?'Done editing':'Edit my gifts')+'</button>';
+ if(!GE && (d.g||[]).some(function(x){return /tomorrow/i.test(x)}))h+=tomorrowPicker();
+ return h+'</div>';
+}
+function tomorrowPicker(){
+ var td=day(tomorrow());
+ if(!TOPEN)return (td.p&&td.p.length?'<div class="msg" style="margin-top:14px">Tomorrow\u2019s 3 challenges are ready for future-you. You can change them tomorrow.</div>':'<button class="chip x" id="topen" style="margin-top:14px">Choose tomorrow\u2019s 3 challenges</button>');
+ var sg=suggested(),all=CH.concat(S.custom),h='<h3 style="margin-top:16px">Choose three for tomorrow</h3><div class="seg"><button data-m="get" aria-pressed="'+(S.mode==='get')+'">I get to</button> <button data-m="want" aria-pressed="'+(S.mode==='want')+'">I want to</button></div><div class="row" style="margin-top:10px"><button class="chip" id="roll2">Roll the dice</button><button class="chip x" id="tclose">Close</button></div><div>';
+ all.forEach(function(c,i){h+='<button class="chip" data-p2="'+i+'" aria-pressed="'+(TPICK.indexOf(c)>-1)+'">'+(sg.indexOf(i)>-1?'★ ':'')+esc(pre()+c)+'</button>'});
+ h+='</div><div class="sub">'+TPICK.length+' of 3 chosen for '+esc(niceDate(tomorrow()))+'.</div><button class="btn" id="tsave"'+(TPICK.length===3?'':' disabled style="opacity:.45"')+'>Save tomorrow\u2019s three</button>';
+ return h;
 }
 function suggested(){var o=[];S.pat.t.forEach(function(t){(SUG[t]||[]).forEach(function(i){if(o.indexOf(i)<0)o.push(i)})});return o}
 function vToday(){
@@ -177,10 +188,11 @@ function vToday(){
   var c=d.c.length;
   h+='<div class="msg">'+(c>=2?'You tried at least two of your three chosen challenges. That counts as a challenge day. Anything else is optional.':c===1?'You tried one challenge. Two of your three is enough for a counted challenge day. Anything else is optional.':'Start with whichever feels useful, or leave it here.')+'</div><button class="chip x" id="ch">Change today\u2019s choices</button>';
  }
- h+='</div>'+welcome();
+ h+='</div>'+thanks()+welcome();
  if(S.buddy)h+='<div class="card"><h3>Walk with '+esc(S.buddy.n||'my buddy')+'</h3><p>'+esc(S.buddy.w)+'</p>'+(S.buddy.solo?'<p class="sub">If they can\u2019t make it, I\u2019m going anyway.</p>':'')+'</div>';
  h+='<details class="card"><summary>Would it help to check in with myself?</summary><p class="sub">You can note how you feel, or skip this completely.</p><div class="feel">'+FEEL.map(function(f,i){return '<button data-f="'+(i+1)+'" aria-pressed="'+(d.f===i+1)+'" aria-label="Feeling '+(i+1)+' of 5">'+f+'</button>'}).join('')+'</div></details>';
  h+='<div class="card"><h3>Feeling a pull toward food?</h3><p class="sub">Pause for a moment. You can notice what is going on without judgement.</p><button class="btn o" data-go="menu">Open Pause &amp; Choose</button></div>';
+ h+=giftCard();
  return h;
 }
 function vMove(){
@@ -288,6 +300,7 @@ function vJourney(){
  if(rows.length){h+='<h3 style="margin-top:18px">Challenge history</h3>';rows.sort(function(a,b){return b.date.localeCompare(a.date)}).forEach(function(row){h+='<div class="log"><b>'+esc(niceDate(row.date))+'</b>'+row.tried.map(function(x){return'<div>'+esc((row.mode==='want'?'I want to ':'I get to ')+x.name)+(x.feel?' <span class="sub">Afterglow: '+FEEL[x.feel-1]+'</span>':'')+'</div>'}).join('')+'</div>'})}
  else h+='<p class="sub">No challenge activity saved yet. There is nothing to catch up on. Choose challenges whenever you want.</p>';
  h+='</div>'+helpCard();
+ h+='<div class="card"><h2>Your data, your choice</h2><p class="sub">Everything in your Journey is yours. You can download a copy any time, or erase it completely from this private link. Erasing cannot be undone.</p><button class="btn o" id="export-data">Download a copy of my data</button> <button class="btn o" id="erase1">Erase everything</button><div id="erase-confirm"></div></div>';
  return h;
 }
 function bind(){
@@ -314,6 +327,17 @@ var q=function(s){return document.querySelector(s)},qa=function(s){return docume
  var ed=q('#ed');if(ed)ed.onclick=function(){EDIT=!EDIT;render()};
  qa('[data-p]').forEach(function(b){b.onclick=function(){var c=CH.concat(S.custom)[+b.dataset.p],i=PICK.indexOf(c);if(i>-1)PICK.splice(i,1);else if(PICK.length<3)PICK.push(c);render()}});
  var st=q('#st');if(st)st.onclick=function(){if(PICK.length===3){var d=day(today());d.sessions=d.sessions||[];if(d.p&&d.p.length)d.sessions.push({p:d.p.slice(),c:(d.c||[]).slice(),ac:Object.assign({},d.ac||{}),mode:d.mode||S.mode});d.p=PICK.slice();d.mode=S.mode;d.c=[];d.ac={};PICK=[];PICKER_OPEN=false;save();render()}};
+ var topen=q('#topen');if(topen)topen.onclick=function(){TOPEN=true;TPICK=[];render()};
+ var tclose=q('#tclose');if(tclose)tclose.onclick=function(){TOPEN=false;TPICK=[];render()};
+ qa('[data-p2]').forEach(function(b){b.onclick=function(){var c=CH.concat(S.custom)[+b.dataset.p2],i=TPICK.indexOf(c);if(i>-1)TPICK.splice(i,1);else if(TPICK.length<3)TPICK.push(c);render()}});
+ var roll2=q('#roll2');if(roll2)roll2.onclick=function(){var pool=CH.concat(S.custom).slice(),picked=[];while(picked.length<3&&pool.length){picked.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0])}TPICK=picked;render()};
+ var tsave=q('#tsave');if(tsave)tsave.onclick=function(){if(TPICK.length===3){var td=day(tomorrow());if(td.p&&td.p.length){td.sessions=td.sessions||[];td.sessions.push({p:td.p.slice(),c:(td.c||[]).slice(),ac:Object.assign({},td.ac||{}),mode:td.mode||S.mode})}td.p=TPICK.slice();td.mode=S.mode;td.c=[];td.ac={};TOPEN=false;TPICK=[];save();render()}};
+ var ex=q('#export-data');if(ex)ex.onclick=function(){var blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='my-journey-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)};
+ var e1=q('#erase1');if(e1)e1.onclick=function(){q('#erase-confirm').innerHTML='<div class="msg">This erases everything stored under your private link, for you and anyone you shared it with. Nothing resets later \u2014 it is gone for good.<br><button class="btn" id="erase2">Yes, erase everything</button> <button class="chip x" id="erase-no">Keep my Journey</button></div>';
+  q('#erase-no').onclick=function(){render()};
+  q('#erase2').onclick=async function(){try{await fetch('/api/state?journey='+encodeURIComponent(profileId),{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})}catch(e){}
+   try{localStorage.removeItem(KEY)}catch(err){}S={start:null,mode:'get',days:{},fast:{start:null,hrs:12},reframes:[],menu:JSON.parse(JSON.stringify(DEF)),pulls:[],pat:{t:[],h:'',m:[]},worked:[],sessionLearnings:[],buddy:null,custom:[],gifts:GD.slice()};CACHE={y2t:S};TOPEN=false;TPICK=[];render()};
+  q('#erase2').focus()};
  var chb=q('#ch');if(chb)chb.onclick=function(){var d=day(today());d.sessions=d.sessions||[];d.sessions.push({p:(d.p||[]).slice(),c:(d.c||[]).slice(),ac:Object.assign({},d.ac||{}),mode:d.mode||S.mode});PICK=(d.p||[]).slice();d.p=[];d.c=[];d.ac={};PICKER_OPEN=true;save();render()};
  var cub=q('#cub');if(cub)cub.onclick=function(){var v=q('#cu').value.trim();if(v){S.custom.push(v);save();render()}};
  qa('[data-a]').forEach(function(b){b.onclick=function(){var d=day(today());d.a=d.a===+b.dataset.a?0:+b.dataset.a;save();render()}});

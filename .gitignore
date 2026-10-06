@@ -5,3 +5,7 @@ _version.js
 # Keep docs out of deploys and commits except the brand logo
 docs/*
 !docs/Yoga to Transform Logo.png
+!docs/Yoga to Transform Icon.png
+!docs/Yoga to Transform Small Icon.png
+!docs/Yoga to Transform text-only.png
+.env
