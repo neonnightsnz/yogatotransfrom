@@ -14,6 +14,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
 <title>Yoga to Transform · My Journey</title>
+<!-- Cal.com element-click embed. The booking link is opened as a popup when a
+     button carrying data-cal-link is clicked, so the button also has a plain
+     href as a fallback for anyone without JavaScript. -->
+<script type="text/javascript">
+(function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if (typeof namespace === "string") { cal.ns[namespace] = cal.ns[namespace] || api; p(cal.ns[namespace], ar); p(cal, ["initNamespace", namespace]); } else p(cal, ar); return; } p(cal, ar); };})(window, "https://app.cal.com/embed/embed.js", "init");
+Cal("init", "secret", { origin: "https://app.cal.com" });
+Cal.config = Cal.config || {};
+Cal.config.forwardQueryParams = true;
+Cal.ns.secret("ui", { theme: "light", cssVarsPerTheme: { light: { "cal-brand": "#12452F" }, dark: { "cal-brand": "#FAF6F3" } }, hideEventTypeDetails: false, layout: "month_view" });
+</script>
 <style>
 :root{color-scheme:light;--bg:#FAF6F3;--card:#fff;--ink:#2A1F1D;--muted:#6B5558;--forest:#12452F;--cocoa:#6B3B35;--blush:#EDE0E0;--rose:#DDB8BC;--accent:#A64F5C;--line:#E8DCD9;--serif:'EB Garamond',Georgia,serif;--sans:'Nunito Sans',system-ui,-apple-system,'Segoe UI',Arial,sans-serif}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--sans);min-height:100vh;padding:calc(18px + env(safe-area-inset-top,0px)) 18px calc(28px + env(safe-area-inset-bottom,0px))}
@@ -41,8 +51,8 @@ h1,h2,h3{font-family:var(--serif);color:var(--cocoa);font-weight:600;line-height
  function esc(value){var el=document.createElement('span');el.textContent=String(value==null?'':value);return el.innerHTML}
  function token(){var url=new URL(location.href),candidate=url.searchParams.get('journey')||'';if(!ID_RE.test(candidate)){try{candidate=localStorage.getItem(PROFILE_KEY)||''}catch(e){candidate=''}}if(!ID_RE.test(candidate))return'';try{localStorage.setItem(PROFILE_KEY,candidate)}catch(e){}return candidate}
  var profile=token(),journeyLink=document.getElementById('journey-link'),playbookLink=document.getElementById('playbook-link');
- var CHECKIN_BOOKING_URL='',action=document.getElementById('checkin-action');
- if(CHECKIN_BOOKING_URL){var a=document.createElement('a');a.className='btn';a.href=CHECKIN_BOOKING_URL;a.target='_blank';a.rel='noopener';a.textContent='Book a check-in';action.innerHTML='';action.appendChild(a)}
+ var CHECKIN_BOOKING_URL='https://cal.com/neonnights/secret',action=document.getElementById('checkin-action');
+ if(CHECKIN_BOOKING_URL){var a=document.createElement('a');a.className='btn';a.href=CHECKIN_BOOKING_URL;a.target='_blank';a.rel='noopener';a.textContent='Book a check-in';a.setAttribute('data-cal-link','neonnights/secret');a.setAttribute('data-cal-namespace','secret');a.setAttribute('data-cal-config','{"layout":"month_view","useSlotsViewOnSmallScreen":"true","theme":"light"}');action.innerHTML='';action.appendChild(a)}
 
  if(profile){journeyLink.href='/journey.html?journey='+encodeURIComponent(profile);playbookLink.href='/journey.html?journey='+encodeURIComponent(profile)+'&tab=playbook'}
  function sessions(day){var list=Array.isArray(day&&day.sessions)?day.sessions.slice():[];if(day&&Array.isArray(day.p)&&day.p.length)list.push({p:day.p,c:day.c||[],ac:day.ac||{}});return list}
