@@ -24,6 +24,7 @@ Cal.config = Cal.config || {};
 Cal.config.forwardQueryParams = true;
 Cal.ns.secret("ui", { theme: "light", cssVarsPerTheme: { light: { "cal-brand": "#12452F" }, dark: { "cal-brand": "#FAF6F3" } }, hideEventTypeDetails: false, layout: "month_view" });
 </script>
+<script src="https://app.cal.com/embed/embed.js" defer></script>
 <style>
 :root{color-scheme:light;--bg:#FAF6F3;--card:#fff;--ink:#2A1F1D;--muted:#6B5558;--forest:#12452F;--cocoa:#6B3B35;--blush:#EDE0E0;--rose:#DDB8BC;--accent:#A64F5C;--line:#E8DCD9;--serif:'EB Garamond',Georgia,serif;--sans:'Nunito Sans',system-ui,-apple-system,'Segoe UI',Arial,sans-serif}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--sans);min-height:100vh;padding:calc(18px + env(safe-area-inset-top,0px)) 18px calc(28px + env(safe-area-inset-bottom,0px))}
@@ -51,8 +52,16 @@ h1,h2,h3{font-family:var(--serif);color:var(--cocoa);font-weight:600;line-height
  function esc(value){var el=document.createElement('span');el.textContent=String(value==null?'':value);return el.innerHTML}
  function token(){var url=new URL(location.href),candidate=url.searchParams.get('journey')||'';if(!ID_RE.test(candidate)){try{candidate=localStorage.getItem(PROFILE_KEY)||''}catch(e){candidate=''}}if(!ID_RE.test(candidate))return'';try{localStorage.setItem(PROFILE_KEY,candidate)}catch(e){}return candidate}
  var profile=token(),journeyLink=document.getElementById('journey-link'),playbookLink=document.getElementById('playbook-link');
+ /* Open the Cal.com booking popup without also navigating away from the app.
+    If the embed has not loaded, the plain href is left to do its job. */
+ function calClick(e){
+  if(typeof window.Cal!=='function')return;
+  e.preventDefault();
+  try{Cal.ns.secret('modal',{calLink:'neonnights/secret'})}
+  catch(err){try{Cal('modal',{calLink:'neonnights/secret'})}catch(err2){window.open(this.href,'_blank','noopener')}}
+ }
  var CHECKIN_BOOKING_URL='https://cal.com/neonnights/secret',action=document.getElementById('checkin-action');
- if(CHECKIN_BOOKING_URL){var a=document.createElement('a');a.className='btn';a.href=CHECKIN_BOOKING_URL;a.target='_blank';a.rel='noopener';a.textContent='Book a check-in';a.setAttribute('data-cal-link','neonnights/secret');a.setAttribute('data-cal-namespace','secret');a.setAttribute('data-cal-config','{"layout":"month_view","useSlotsViewOnSmallScreen":"true","theme":"light"}');action.innerHTML='';action.appendChild(a)}
+ if(CHECKIN_BOOKING_URL){var a=document.createElement('a');a.className='btn';a.href=CHECKIN_BOOKING_URL;a.rel='noopener';a.textContent='Book a check-in';a.setAttribute('data-cal-link','neonnights/secret');a.setAttribute('data-cal-namespace','secret');a.setAttribute('data-cal-config','{"layout":"month_view","useSlotsViewOnSmallScreen":"true","theme":"light"}');a.addEventListener('click',calClick);action.innerHTML='';action.appendChild(a)}
 
  if(profile){journeyLink.href='/journey.html?journey='+encodeURIComponent(profile);playbookLink.href='/journey.html?journey='+encodeURIComponent(profile)+'&tab=playbook'}
  function sessions(day){var list=Array.isArray(day&&day.sessions)?day.sessions.slice():[];if(day&&Array.isArray(day.p)&&day.p.length)list.push({p:day.p,c:day.c||[],ac:day.ac||{}});return list}

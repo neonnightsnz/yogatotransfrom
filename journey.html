@@ -11,6 +11,16 @@
 <link rel="manifest" href="/assets/brand/site.webmanifest">
 <meta name="theme-color" content="#FAF6F3">
 <title>My Journey · Yoga to Transform</title>
+<!-- Cal.com element-click embed. Buttons carrying data-cal-link open the booking
+     popup instead of navigating; the plain href stays as a no-JavaScript fallback. -->
+<script type="text/javascript">
+(function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if (typeof namespace === "string") { cal.ns[namespace] = cal.ns[namespace] || api; p(cal.ns[namespace], ar); p(cal, ["initNamespace", namespace]); } else p(cal, ar); return; } p(cal, ar); };})(window, "https://app.cal.com/embed/embed.js", "init");
+Cal("init", "secret", { origin: "https://app.cal.com" });
+Cal.config = Cal.config || {};
+Cal.config.forwardQueryParams = true;
+Cal.ns.secret("ui", { theme: "light", cssVarsPerTheme: { light: { "cal-brand": "#12452F" }, dark: { "cal-brand": "#FAF6F3" } }, hideEventTypeDetails: false, layout: "month_view" });
+</script>
+<script src="https://app.cal.com/embed/embed.js" defer></script>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{font-size:17px;color-scheme:light;--bg:#FAF6F3;--card:#fff;--ink:#2A1F1D;--muted:#6B5558;--forest:#12452F;--cocoa:#6B3B35;--rose:#DDB8BC;--blush:#EDE0E0;--accent:#A64F5C;--line:#E8DCD9;--on-forest:#fff;
@@ -278,13 +288,17 @@ function vTimer(){
  return h;
 }
 var CONTACT='https://www.yogatotransform.com/contact-us';
-/* TODO: Add approved email and meeting links only after confirmation. Leave blank to use CONTACT. */
+/* Cal.com element-click booking. Swap BOOKING for Kristina's own link when it arrives;
+   the button keeps a plain href so it still works without JavaScript. */
+var BOOKING='https://cal.com/neonnights/secret',BOOKING_NS='secret',BOOKING_SLUG='neonnights/secret';
+/* TODO: Add approved email links only after confirmation. Leave blank to use CONTACT. */
 var TEAM=[{n:'Kristina',email:'',meet:''}];
 function helpCard(){
  var h='<div class="card"><h3>Want a hand? Ask Kristina</h3><p class="sub">If a pattern keeps showing up or today feels heavy, you don\u2019t have to work it out alone. Reach out, or book a time to talk it through.</p>';
  TEAM.forEach(function(t){
   var m=t.email?'mailto:'+t.email+'?subject='+encodeURIComponent('A hand with my journey')+'&body='+encodeURIComponent('Hi '+t.n+',\n\nI\u2019d love some support with...'):CONTACT;
-  h+='<div class="row" style="margin:6px 0"><a class="btn" href="'+m+'" target="_blank" rel="noopener">Message '+t.n+'</a><a class="btn o" href="'+(t.meet||CONTACT)+'" target="_blank" rel="noopener">Book a chat with '+t.n+'</a></div>';
+  var book='<a class="btn o" href="'+(t.meet||BOOKING)+'" data-cal-link="'+BOOKING_SLUG+'" data-cal-namespace="'+BOOKING_NS+'" data-cal-config=\'{"layout":"month_view","useSlotsViewOnSmallScreen":"true","theme":"light"}\' data-cal-open="1">Book a chat with '+t.n+'</a>';
+  h+='<div class="row" style="margin:6px 0"><a class="btn" href="'+m+'" target="_blank" rel="noopener">Message '+t.n+'</a>'+book+'</div>';
  });
  h+='<p class="sub">Nothing from this app is sent when you reach out. If you\u2019re in distress, call or text 1737 any time (NZ). In an emergency, call 111.</p></div>';
  return h;
@@ -497,6 +511,14 @@ function bindMeals(q,qa){
 function bind(){
 var q=function(s){return document.querySelector(s)},qa=function(s){return document.querySelectorAll(s)};
  bindMeals(q,qa);
+ /* Open the Cal.com booking popup without also navigating away from the app.
+    If the embed has not loaded, the plain href is left to do its job. */
+ qa('[data-cal-open]').forEach(function(a){a.onclick=function(e){
+  if(typeof window.Cal!=='function')return;
+  e.preventDefault();
+  try{Cal.ns[BOOKING_NS]('modal',{calLink:BOOKING_SLUG})}
+  catch(err){try{Cal('modal',{calLink:BOOKING_SLUG})}catch(err2){window.open(a.href,'_blank','noopener')}}
+ }});
  q("#feeling-note")&&q("#feeling-note").addEventListener("toggle",function(){PFOPEN=q("#feeling-note").open});
  qa("details[data-pb]").forEach(function(d){d.addEventListener("toggle",function(){PB_SECTIONS[d.dataset.pb]=d.open})});
   var copyLink=q('#copy-link');if(copyLink)copyLink.onclick=async function(){var input=q('#private-link'),status=q('#copy-status');try{await navigator.clipboard.writeText(input.value);status.textContent='Private link copied.'}catch(e){input.focus();input.select();status.textContent='Select and copy your private link.'}};
