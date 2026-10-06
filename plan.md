@@ -21,15 +21,16 @@ The app currently has no recipe data to populate meal ideas. The chosen directio
 - Overview copy describes learning as coming from the client’s own experience, reflection and conversations.
 - The Playbook leads with “What worked last time”; patterns, session learnings and reframing are available in collapsed sections.
 - Today shows progress across the three selected choices and asks for one optional feeling check-in after all three are complete. The optional Pause & Choose feeling reflection is tucked behind a disclosure; notes can be saved directly.
-- Selecting “Choose tomorrow’s 3 challenges” from the gift checklist opens the challenge picker. The Move view includes varied activity ideas and additional preference choices.
+- Selecting “Choose tomorrow’s 3 challenges” from the gift checklist opens the challenge picker (and unticking it closes the picker and clears unsaved picks). The Move view includes varied activity ideas and additional preference choices, including Pilates, hiking, team sports and gardening.
 - The overview has a check-in calls card for the 75-day package. Its booking link is a placeholder until a Cal.com URL is supplied.
+- The 75-day welcome flow is restored on Today: begin date, "Let’s get to know you", skippable at every step.
 
 ## Next: restore the 75-day welcome flow
 
-1. Restore a short start screen with a selectable begin date (default to today) and “Begin my 75 days.”
-2. Follow with “Let’s get to know you” and the “Tell me about me” picklists, using the existing Playbook pattern choices.
-3. Keep setup skippable and retain access to the open-ended Journey. The 75-day framing must not introduce missed-day, streak-loss or catch-up pressure.
-4. Add the Cal.com booking URL to the overview booking card when available. Confirm the included call count and suggested booking timing before making those details more specific in the copy.
+1. ~~Restore a short start screen with a selectable begin date (default to today) and "Begin my 75 days."~~ Done: the Today view opens with the welcome card; a back-dated or default date sets `S.start`, and a "Day N of your 75 days" counter appears on Today with no-pressure wording.
+2. ~~Follow with "Let's get to know you" and the "Tell me about me" picklists, using the existing Playbook pattern choices.~~ Done: the second card reuses the patterns picklists (tendencies, trickiest time, movement enjoyed); the same chips work here and in the Playbook.
+3. ~~Keep setup skippable and retain access to the open-ended Journey.~~ Done: "Skip for now" and "Skip this part" both mark setup complete without a start date, and the rest of Today stays reachable the whole time. No missed-day, streak-loss or catch-up language anywhere in the flow.
+4. Add the Cal.com booking URL to the overview booking card when available. Confirm the included call count and suggested booking timing before making those details more specific in the copy. The overview card currently reads "Booking link coming soon." (`CHECKIN_BOOKING_URL` in `index.html` is a single constant to fill in.)
 ## Meals: flexible weekly planning
 
 ### Experience
