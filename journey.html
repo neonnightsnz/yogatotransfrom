@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="/assets/brand/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="750x745" href="/assets/brand/logo-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/brand/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png">
+<link rel="manifest" href="/assets/brand/site.webmanifest">
+<meta name="theme-color" content="#FAF6F3">
 <title>My Journey · Yoga to Transform</title>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -16,6 +23,7 @@ h1,h2,h3{font-family:var(--serif);color:var(--cocoa);font-weight:600;margin:0 0 
 h1{font-size:2rem}h2{font-size:1.5rem}h3{font-size:1.2rem}p{margin:0 0 .9em}
 .sub{color:var(--muted);font-size:1rem}
 header{padding:22px 0 8px}
+.brand-lockup{display:flex;align-items:center;gap:10px;margin:8px 0 4px}.brand-icon{width:42px;height:42px;object-fit:contain}.brand-wordmark{display:block;width:min(170px,50vw);max-height:78px;height:auto;object-fit:contain;object-position:left center}
 nav{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);display:flex;gap:6px;padding:10px 0;z-index:5;border-bottom:1px solid var(--line);overflow-x:auto}
 nav button{flex:1;min-width:max-content;font:700 1rem var(--sans);padding:10px 12px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
 nav button[aria-selected=true]{background:var(--forest);border-color:var(--forest);color:var(--on-forest)}
@@ -52,12 +60,12 @@ a.btn{display:inline-block;text-decoration:none}button:focus-visible,a:focus-vis
 </head>
 <body>
 <div class="app">
-<header><div style="text-align:right"><a href="/">Back to my tracker</a></div><div class="sub">Yoga to Transform</div><h1>My journey</h1><p class="sub">Seventy-five days of small, kind choices. Nothing resets if you miss a day.</p></header>
+<header><div style="text-align:right"><a href="/">Back to my overview</a></div><div class="brand-lockup"><img class="brand-icon" src="/assets/brand/logo-small-icon.png" alt=""><img class="brand-wordmark" src="/assets/brand/logo-text-only.png" alt="Yoga to Transform"></div><h1>My Journey</h1><p class="sub">A space to notice patterns and keep what you learn. There is no deadline, and nothing resets if you miss a day.</p></header>
 <nav role="tablist" id="tabs"></nav>
 <main id="main"></main>
 </div>
 <script>
-var KEY='y2t-journey-v1',PROFILE_KEY='y2t-profile-id',TABS=[['today','Today'],['move','Move'],['timer','Meal window'],['menu','Menu'],['playbook','Playbook'],['journey','Journey']],tab='today';
+var KEY='y2t-journey-v1',PROFILE_KEY='y2t-profile-id',TABS=[['today','Today'],['move','Move'],['timer','Meal window'],['menu','Pause & Choose'],['playbook','Playbook'],['journey','Journey']],tab=(function(){var t=new URL(location.href).searchParams.get('tab');return TABS.some(function(x){return x[0]===t})?t:'today'})();
 var legacyMigrationAllowed=false,profileId=resolveProfileId(),CACHE={},syncReady=false,_syncTimer=null;
 function resolveProfileId(){
  var valid=/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -72,7 +80,7 @@ function resolveProfileId(){
 }
 var ITEMS=['move my body in a way I enjoy','drink water through the day','fill my plate with real food I enjoy','eat sitting down, from a plate, slowly','read or breathe for ten quiet minutes','wind down for a good night\u2019s sleep'];
 var FEEL=['\uD83D\uDE1E','\uD83D\uDE15','\uD83D\uDE42','\uD83D\uDE0A','\uD83E\uDD29'];
-var S={start:null,mode:'get',days:{},fast:{start:null,hrs:12},reframes:[],menu:null,pulls:[],pat:{t:[],h:'',m:[]},worked:[],buddy:null,custom:[]};
+var S={start:null,mode:'get',days:{},fast:{start:null,hrs:12},reframes:[],menu:null,pulls:[],pat:{t:[],h:'',m:[]},worked:[],sessionLearnings:[],buddy:null,custom:[]};
 
 var CATS=[['starters','Starters','Quick, a few minutes'],['mains','Mains','An hour or so'],['sides','Sides','Alongside the boring jobs'],['desserts','Desserts','Once in a while. Notice how you feel afterwards'],['specials','Specials','When they\u2019re available to you']];
 var DEF={starters:['Dance to a favourite song','Have a snack','One minute of star jumps','Hug a pet'],mains:['Bake','Paint','Journal','Go for a walk','Do a jigsaw puzzle','Plan a trip'],sides:['Music while I tidy','Listen to a podcast','Light a candle','Audiobook'],desserts:['Scroll social media','Watch TV'],specials:['Book a holiday','Go to a concert','Massage or nails']};
@@ -82,7 +90,7 @@ var CH=['go for a 30-minute walk','do 10 minutes of strength with weights or my 
 var PT=[['fast','I eat too fast'],['bored','I snack when bored'],['skip','I skip meals, then overeat'],['tired','I eat for comfort when tired or stressed'],['evening','I graze in the evening'],['sweet','I have a sweet tooth']];
 var SUG={fast:[6],bored:[9,11,12],skip:[5,8],tired:[13,12],evening:[8,9],sweet:[3,9]};
 var HT=['Morning','Afternoon','Evening','Late night'],MV=['Walking','Dancing','Yoga','Strength','Swimming','Cycling'];
-var PE=false,PB=-1,PICK=[],MW={w:'out',e:'mid'};
+var PE=false,PB=-1,PICK=[],PICKER_OPEN=false,MW={w:'out',e:'mid'};
 var PLAN={out:{low:'A ten-minute stroll round the block. Going counts.',mid:'An easy 20-minute walk. Pick a route you love.',full:'A brisk 30 to 45 minute walk. Add hills, or a backpack with a little weight.'},in:{low:'Five minutes of gentle stretching and slow breathing, or dance to one favourite song.',mid:'Ten minutes: 2 rounds of 10 squats, 10 wall push-ups and 30 seconds of marching on the spot.',full:'Twenty minutes: 3 rounds of 10 squats, 10 wall push-ups, 10 glute bridges and a 20-second plank. Rest when you need to.'}};
 var GD=['Choose tomorrow\u2019s 3 challenges','Pack my gym bag','Put my shoes by the front door','Set an alarm for tomorrow','Pack my lunch for tomorrow','Lay out my yoga gear','Put overnight oats or chia in the fridge','Fill a water bottle'],GE=false;
 if(!S.gifts)S.gifts=GD.slice();
@@ -96,11 +104,12 @@ function scheduleSync(){
 }
 function save(){if(!syncReady)return;CACHE.y2t=S;scheduleSync()}
 function ds(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function niceDate(k){if(!/^\d{4}-\d{2}-\d{2}$/.test(String(k||'')))return'';return new Date(k+'T00:00').toLocaleDateString('en-NZ',{day:'numeric',month:'short',year:'numeric'})}
 function today(){return ds(new Date())}
 function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML}
 function day(k){return S.days[k]||(S.days[k]={c:[],f:0})}
-function dayNum(){if(!S.start)return 0;var a=new Date(S.start+'T00:00'),b=new Date(today()+'T00:00');return Math.round((b-a)/864e5)+1}
-function counted(k){var d=S.days[k];return d&&d.p&&d.p.length&&d.c.length>=2}
+function challengeSessions(d){var out=(d&&Array.isArray(d.sessions)?d.sessions:[]).slice();if(d&&d.p&&d.p.length)out.push({p:d.p,c:d.c||[],ac:d.ac||{},mode:d.mode||S.mode});return out}
+function counted(k){var d=S.days[k];return challengeSessions(d).some(function(s){return s.p&&s.p.length&&(s.c||[]).length>=2})}
 function pre(){return S.mode==='get'?'I get to ':'I want to '}
 function render(){
  var t=document.getElementById('tabs');
@@ -112,28 +121,27 @@ function render(){
 }
 function glowViews(){
  var by={},days=[],h='',all=0;
- for(var i=13;i>=0;i--){var dd=new Date();dd.setDate(dd.getDate()-i);var d=S.days[ds(dd)],v=[];
-  if(d&&d.ac)Object.keys(d.ac).forEach(function(j){var r=d.ac[j];if(r){v.push(r);var t=(d.p||[])[j];if(t){(by[t]=by[t]||[]).push(r)}all++}});
-  days.push(v.length?v.reduce(function(a,b){return a+b},0)/v.length:0)}
- var tot=0;Object.keys(S.days).forEach(function(k){var d=S.days[k];if(d.ac)tot+=Object.keys(d.ac).length});
+ for(var i=13;i>=0;i--){var dd=new Date();dd.setDate(dd.getDate()-i);var d=S.days[ds(dd)],ratings=[];
+  challengeSessions(d).forEach(function(session){Object.keys(session.ac||{}).forEach(function(j){var r=session.ac[j];if(r&&session.c&&session.c.indexOf(+j)>-1){ratings.push(r);var t=session.p[+j];if(t)(by[t]=by[t]||[]).push(r);all++}})});
+  days.push(ratings.length?ratings.reduce(function(a,b){return a+b},0)/ratings.length:0)}
  if(days.filter(Boolean).length>=3){
-  h+='<h3 style="margin-top:16px">Afterglow, last 14 days</h3><svg viewBox="0 0 140 44" width="100%" role="img" aria-label="Afterglow over the last 14 days">';
+  h+='<h3 style="margin-top:16px">Afterglow notes, last 14 days</h3><svg viewBox="0 0 140 44" width="100%" role="img" aria-label="Optional afterglow ratings over the last 14 days">';
   days.forEach(function(v,i){h+='<rect x="'+(i*10)+'" y="'+(40-(v?v/5*36:2))+'" width="8" height="'+(v?v/5*36:2)+'" rx="2" fill="'+(v?'var(--forest)':'var(--blush)')+'"/>'});
-  h+='</svg><p class="sub">Taller bars mean you felt better afterwards.</p>';
+  h+='</svg><p class="sub">A personal note to help you notice what fits you.</p>';
  }
  var top=Object.keys(by).map(function(t){return[t,by[t].reduce(function(a,b){return a+b},0)/by[t].length,by[t].length]}).filter(function(x){return x[2]>=2}).sort(function(a,b){return b[1]-a[1]}).slice(0,3);
- if(tot>=3&&top.length){h+='<h3 style="margin-top:12px">What leaves me feeling best</h3>';top.forEach(function(x){h+='<div class="out">'+esc(x[0])+' <span class="sub">'+x[1].toFixed(1)+' out of 5</span></div>'})}
+ if(all>=3&&top.length){h+='<h3 style="margin-top:12px">Challenges I have rated highly</h3>';top.forEach(function(x){h+='<div class="out">'+esc(x[0])+' <span class="sub">'+x[1].toFixed(1)+' out of 5</span></div>'})}
  return h;
 }
 function welcome(){
- if(!S.start)return'';var last=null;
- Object.keys(S.days).forEach(function(k){var d=S.days[k];if(d.c&&d.c.length&&(!last||k>last))last=k});
+ var last=null;
+ Object.keys(S.days).forEach(function(k){var d=S.days[k];if(challengeSessions(d).some(function(s){return s.c&&s.c.length})&&(!last||k>last))last=k});
  if(!last)return'';
  var gap=Math.round((new Date(today()+'T00:00')-new Date(last+'T00:00'))/864e5);
  if(gap<3)return'';
- var h='<div class="card"><h3>Welcome back</h3><p>Nothing has reset. Pick up today. '+(S.worked.length?'Here\u2019s what worked for you before:':'Tip: jot down what works for you in your playbook.')+'</p>';
+ var h='<div class="card"><h3>Welcome back</h3><p>There is nothing to catch up on. Come back whenever it suits you. '+(S.worked.length?'Here\u2019s what worked for you before:':'')+'</p>';
  S.worked.slice(0,3).forEach(function(x){h+='<div class="out">'+esc(x)+'</div>'});
- return h+'<button class="btn o" data-go="playbook">Open my playbook</button></div>';
+ return h+'<button class="btn o" data-go="playbook">Open my Playbook</button></div>';
 }
 function yest(){var d=new Date();d.setDate(d.getDate()-1);return ds(d)}
 function thanks(){var y=S.days[yest()];if(!y||!y.g||!y.g.length)return'';
@@ -150,30 +158,29 @@ function giftCard(){
 }
 function suggested(){var o=[];S.pat.t.forEach(function(t){(SUG[t]||[]).forEach(function(i){if(o.indexOf(i)<0)o.push(i)})});return o}
 function vToday(){
- var k=today(),d=day(k),n=dayNum(),h='';
- if(!S.start)h+='<div class="card"><h2>Ready when you are</h2><p class="sub">Pick the day you\u2019d like to begin. Today works.</p><input type="date" id="sd" value="'+today()+'"><button class="btn" id="go">Begin my 75 days</button></div>';
- else h+='<div class="card"><div class="sub">Your journey</div><div class="big">Day '+Math.min(n,75)+'<span class="sub"> of 75</span></div></div>';
- h+=thanks()+welcome();
- if(!S.pat.t.length&&!S.pat.h)h+='<div class="card"><h3>Let\u2019s get to know you</h3><p class="sub">A couple of minutes to set things up around your own patterns.</p><button class="btn o" data-go="playbook">Tell me about me</button></div>';
- h+='<div class="card"><div class="row" style="justify-content:space-between"><h2>Today\u2019s 3 challenges</h2><div class="seg"><button data-m="get" aria-pressed="'+(S.mode==='get')+'">I get to</button> <button data-m="want" aria-pressed="'+(S.mode==='want')+'">I want to</button></div></div>';
+ var k=today(),d=day(k),h='';
+ h+='<div class="card"><h2>You are fine as you are</h2><p class="sub">There is nothing you need to do today. No judgement. If you want to explore something, you can choose three challenges for today and see what you learn about yourself.</p>';
  if(!d.p||!d.p.length){
-  var sg=suggested(),all=CH.concat(S.custom);
-  h+='<p class="sub">Choose three to try today. Try something new, repeat a favourite, or change them tomorrow. Nothing here is forever.'+(sg.length?' \u2605 = suggested for you.':'')+'</p><div>';
-  all.forEach(function(c,i){h+='<button class="chip" data-p="'+i+'" aria-pressed="'+(PICK.indexOf(c)>-1)+'">'+(sg.indexOf(i)>-1?'\u2605 ':'')+esc(c)+'</button>'});
-  h+='</div><div class="add"><input type="text" id="cu" maxlength="60" placeholder="Add my own challenge" aria-label="Add my own challenge"><button class="chip" id="cub">Add</button></div><div class="sub">'+PICK.length+' of 3 chosen</div><button class="btn" id="st"'+(PICK.length===3?'':' disabled style="opacity:.45"')+'>Start today\u2019s challenges</button>';
+  if(!PICKER_OPEN)h+='<button class="btn" id="challenge-open">I want to challenge myself</button>';
+  else{
+   h+='<h3>Choose three challenges for today</h3><div class="seg"><button data-m="get" aria-pressed="'+(S.mode==='get')+'">I get to</button> <button data-m="want" aria-pressed="'+(S.mode==='want')+'">I want to</button></div><p class="sub" style="margin-top:10px">Choose the ones that feel useful or interesting. You can change your choices before saving, or leave this for another day.</p><div class="row"><button class="chip" id="roll">Roll the dice</button><button class="chip x" id="challenge-cancel">Not today</button></div><div>';
+   var sg=suggested(),all=CH.concat(S.custom);
+   all.forEach(function(c,i){h+='<button class="chip" data-p="'+i+'" aria-pressed="'+(PICK.indexOf(c)>-1)+'">'+(sg.indexOf(i)>-1?'★ ':'')+esc(pre()+c)+'</button>'});
+   h+='</div><div class="add"><input type="text" id="cu" maxlength="60" placeholder="Add my own challenge" aria-label="Add my own challenge"><button class="chip" id="cub">Add</button></div><div class="sub">'+PICK.length+' of 3 chosen. Tap a chosen challenge to remove it, then choose a replacement.</div><button class="btn" id="st"'+(PICK.length===3?'':' disabled style="opacity:.45"')+'>Save my three choices</button>';
+  }
  }else{
+  h+='<h3>My choices for today</h3>';
   d.p.forEach(function(it,i){var on=d.c.indexOf(i)>-1;h+='<label class="tick'+(on?' done':'')+'"><input type="checkbox" data-i="'+i+'"'+(on?' checked':'')+'><span>'+pre()+esc(it)+'</span></label>';
    if(on){var ac=(d.ac||{})[i];h+='<div style="padding-left:36px"><div class="sub">How did that feel?</div><div class="feel">'+FEEL.map(function(f,r){return '<button data-ac="'+i+'-'+(r+1)+'" aria-pressed="'+(ac===r+1)+'" aria-label="Afterglow '+(r+1)+' of 5">'+f+'</button>'}).join('')+'</div>';
-    if(PB===i)h+='<div class="msg">That felt good. Add it to your playbook so you remember?<br><button class="chip" data-pbadd="'+i+'">Add to playbook</button><button class="chip x" data-pbx="1">Not now</button></div>';
+    if(PB===i)h+='<div class="msg">That felt good. Add it to your Playbook so you remember?<br><button class="chip" data-pbadd="'+i+'">Add to my Playbook</button><button class="chip x" data-pbx="1">Not now</button></div>';
     h+='</div>'}});
   var c=d.c.length;
-  h+='<div class="msg">'+(c>=2?'That\u2019s today counted. Anything else is a bonus.':c===1?'One down. Two counts as a full day.':'Start with whichever feels easiest.')+'</div><button class="chip x" id="ch">Change my picks</button>';
+  h+='<div class="msg">'+(c>=2?'You tried at least two of your three chosen challenges. That counts as a challenge day. Anything else is optional.':c===1?'You tried one challenge. Two of your three is enough for a counted challenge day. Anything else is optional.':'Start with whichever feels useful, or leave it here.')+'</div><button class="chip x" id="ch">Change today\u2019s choices</button>';
  }
- h+='</div>';
+ h+='</div>'+welcome();
  if(S.buddy)h+='<div class="card"><h3>Walk with '+esc(S.buddy.n||'my buddy')+'</h3><p>'+esc(S.buddy.w)+'</p>'+(S.buddy.solo?'<p class="sub">If they can\u2019t make it, I\u2019m going anyway.</p>':'')+'</div>';
- h+=giftCard();
- h+='<div class="card"><h3>How do I feel today?</h3><div class="feel">'+FEEL.map(function(f,i){return '<button data-f="'+(i+1)+'" aria-pressed="'+(d.f===i+1)+'" aria-label="Feeling '+(i+1)+' of 5">'+f+'</button>'}).join('')+'</div></div>';
- h+='<div class="card"><h3>Feeling a pull toward food?</h3><p class="sub">'+(S.pat.h?'Your tricky time is '+S.pat.h.toLowerCase()+'. Have a starter ready. ':'')+'Pause for a moment and check your menu.</p><button class="btn o" data-go="menu">Open my menu</button></div>';
+ h+='<details class="card"><summary>Would it help to check in with myself?</summary><p class="sub">You can note how you feel, or skip this completely.</p><div class="feel">'+FEEL.map(function(f,i){return '<button data-f="'+(i+1)+'" aria-pressed="'+(d.f===i+1)+'" aria-label="Feeling '+(i+1)+' of 5">'+f+'</button>'}).join('')+'</div></details>';
+ h+='<div class="card"><h3>Feeling a pull toward food?</h3><p class="sub">Pause for a moment. You can notice what is going on without judgement.</p><button class="btn o" data-go="menu">Open Pause &amp; Choose</button></div>';
  return h;
 }
 function vMove(){
@@ -189,7 +196,9 @@ function vPlaybook(){
  HT.forEach(function(x){h+='<button class="chip" data-ph="'+x+'" aria-pressed="'+(S.pat.h===x)+'">'+x+'</button>'});
  h+='</div><h3 style="margin-top:12px">Movement I enjoy</h3><div>';
  MV.forEach(function(x){h+='<button class="chip" data-pm="'+x+'" aria-pressed="'+(S.pat.m.indexOf(x)>-1)+'">'+x+'</button>'});
- h+='</div></div><div class="card"><h2>What worked last time</h2><p class="sub">Write it down now so you can find it when you need to start again.</p><input type="text" id="wk" maxlength="140" placeholder="e.g. Celery and egg lunch kept me full" aria-label="What worked"><button class="btn" id="wks">Add to my playbook</button>';
+ h+='</div></div><div class="card"><h2>Session learnings</h2><p class="sub">After a conversation with Kristina, keep a pattern or learning that feels useful. Add it in your own words. This is yours to choose; nothing here becomes a task.</p><label class="sub" for="sl-learning">What did we talk about that I want to remember?</label><textarea id="sl-learning" maxlength="500" rows="3" style="width:100%;font:1rem var(--sans);padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);margin:4px 0 12px"></textarea><label class="sub" for="sl-note">What do I want to remember for myself? (optional)</label><textarea id="sl-note" maxlength="500" rows="2" style="width:100%;font:1rem var(--sans);padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);margin:4px 0 12px"></textarea><button class="btn" id="sl-save">Save to my Playbook</button>';
+ (S.sessionLearnings||[]).forEach(function(x){h+='<div class="log"><b>'+esc(niceDate(x.date))+'</b><p>'+esc(x.learning||'')+'</p>'+(x.remember?'<p class="sub">'+esc(x.remember)+'</p>':'')+'</div>'});
+ h+='</div><div class="card"><h2>What worked last time</h2><p class="sub">Keep a note you can return to whenever it feels useful.</p><input type="text" id="wk" maxlength="140" placeholder="e.g. Celery and egg lunch kept me full" aria-label="What worked"><button class="btn" id="wks">Add to my Playbook</button>';
  S.worked.forEach(function(x,i){h+='<div class="out">'+esc(x)+(PE?' <button class="chip x" data-wd="'+i+'" aria-label="Delete note">Delete</button>':'')+'</div>'});
  if(S.worked.length||S.reframes.length)h+='<button class="chip x" id="wed">'+(PE?'Done editing':'Edit or delete notes')+'</button>';
  return h+'</div>'+vReframe();
@@ -197,14 +206,14 @@ function vPlaybook(){
 var MEALVIDEO=''; /* TODO: Add the approved video link when ready. Keep blank until confirmed. */
 function mealExtras(){
  var h='<div class="card"><h3>Watch: how to use your meal window</h3>';
- h+=MEALVIDEO?'<a class="btn" href="'+MEALVIDEO+'" target="_blank" rel="noopener">Watch the video</a>':'<div class="vid"><div class="pl">\u25B6</div><b>Video coming soon</b><span class="sub">A short walk-through from Kristina and Audrie</span></div>';
+ h+=MEALVIDEO?'<a class="btn" href="'+MEALVIDEO+'" target="_blank" rel="noopener">Watch the video</a>':'<div class="vid"><div class="pl">\u25B6</div><b>Video coming soon</b><span class="sub">A short walk-through from Kristina</span></div>';
  h+='</div><div class="card"><h3>Making it work</h3>';
  [['What this is','A gentle rest between your last meal and your first, mostly while you sleep. For example, finish dinner at 7pm and have breakfast at 7am. It isn\u2019t about eating less overall. It\u2019s a way to notice hunger and enjoy your meals more.'],
  ['Start gently','Begin with 12 hours. Add an hour only if you feel good. There\u2019s no prize for going longer.'],
  ['When your window opens','Sit down and serve your plate. Include some protein and fibre so you feel full, and eat slowly. Notice how the first meal tastes.'],
  ['When hunger shows up','Hunger comes in waves and often passes. Try water or herbal tea first. If you\u2019re really hungry, lightheaded or shaky, eat. Listening to your body is the point.'],
  ['Keep it light','Treat it as a fun challenge, not a test. Missed it today? Try again tomorrow. Nothing resets.'],
- ['Signs to stop or change it','Feeling tired, irritable or anxious about food, sleeping badly, or eating a lot more later. Shorten the window or stop, and talk to Kristina or Audrie.']
+ ['Signs to stop or change it','Feeling tired, irritable or anxious about food, sleeping badly, or eating a lot more later. Shorten the window or stop, and talk to Kristina.']
  ].forEach(function(x){h+='<details><summary>'+x[0]+'</summary><p>'+x[1]+'</p></details>'});
  return h+'</div>';
 }
@@ -221,9 +230,9 @@ function vTimer(){
 }
 var CONTACT='https://www.yogatotransform.com/contact-us';
 /* TODO: Add approved email and meeting links only after confirmation. Leave blank to use CONTACT. */
-var TEAM=[{n:'Kristina',email:'',meet:''},{n:'Audrie',email:'',meet:''}];
+var TEAM=[{n:'Kristina',email:'',meet:''}];
 function helpCard(){
- var h='<div class="card"><h3>Want a hand? Ask Kristina or Audrie</h3><p class="sub">If a pattern keeps showing up or today feels heavy, you don\u2019t have to work it out alone. Reach out, or book a time to talk it through.</p>';
+ var h='<div class="card"><h3>Want a hand? Ask Kristina</h3><p class="sub">If a pattern keeps showing up or today feels heavy, you don\u2019t have to work it out alone. Reach out, or book a time to talk it through.</p>';
  TEAM.forEach(function(t){
   var m=t.email?'mailto:'+t.email+'?subject='+encodeURIComponent('A hand with my journey')+'&body='+encodeURIComponent('Hi '+t.n+',\n\nI\u2019d love some support with...'):CONTACT;
   h+='<div class="row" style="margin:6px 0"><a class="btn" href="'+m+'" target="_blank" rel="noopener">Message '+t.n+'</a><a class="btn o" href="'+(t.meet||CONTACT)+'" target="_blank" rel="noopener">Book a chat with '+t.n+'</a></div>';
@@ -232,7 +241,7 @@ function helpCard(){
  return h;
 }
 function vMenu(){
- var h='<div class="card"><h2>When I feel the pull</h2><p class="sub">Reaching for food when we\u2019re feeling something is human. Noticing it is the skill. No guilt needed: notice, choose, and learn. Each time you spot an old pattern, you get another chance to choose differently.</p><h3>What am I feeling?</h3><div>';
+ var h='<div class="card"><h2>Pause &amp; Choose</h2><h3>When I feel the pull</h3><p class="sub">Reaching for food when we\u2019re feeling something is human. Noticing it is the skill. No guilt needed: notice, choose, and learn. Each time you spot an old pattern, you get another chance to choose differently.</p><h3>What am I feeling?</h3><div>';
  FEELINGS.forEach(function(f){h+='<button class="chip" data-pf="'+f+'" aria-pressed="'+(PF===f)+'">'+f+'</button>'});
  h+='</div><label class="sub" for="pn" style="display:block;margin-top:12px">What did I notice, or what might I try next time? (optional)</label><input type="text" id="pn" maxlength="140" value="'+esc(NOTE)+'"></div>';
  if(MSG)h+='<div class="msg">'+MSG+'</div>';
@@ -241,13 +250,13 @@ function vMenu(){
   S.menu[c[0]].forEach(function(it,j){h+='<button class="chip'+(EDIT?' x':'')+'" data-c="'+c[0]+'" data-j="'+j+'">'+esc(it)+(EDIT?' \u00D7':'')+'</button>'});
   h+='</div><div class="add"><input type="text" data-add="'+c[0]+'" placeholder="Add your own" maxlength="50" aria-label="Add to '+c[1]+'"><button class="chip" data-addb="'+c[0]+'">Add</button></div></div>';
  });
- h+='<div class="card"><p>Ate for comfort anyway? That\u2019s okay. Logging it is how you spot the pattern.</p><button class="btn o" id="ate">I ate for comfort, and that\u2019s okay</button> <button class="btn o" id="ed">'+(EDIT?'Done editing menu':'Edit my menu')+'</button></div>';
+ h+='<div class="card"><p>Ate for comfort anyway? That\u2019s okay. Logging it is how you spot the pattern.</p><button class="btn o" id="ate">I ate for comfort, and that\u2019s okay</button> <button class="btn o" id="ed">'+(EDIT?'Done editing choices':'Edit my choices')+'</button></div>';
  h+=helpCard();
  var P=S.pulls;
  if(P.length){
   var ch=P.filter(function(x){return x.ty==='chose'}).length,cnt={};P.forEach(function(x){cnt[x.f]=(cnt[x.f]||0)+1});
   var top=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]})[0];
-  h+='<div class="card"><h3>What I\u2019m noticing</h3><p class="sub">'+P.length+' moments noticed. '+ch+' times I chose something from my menu.'+(P.length>=3?' Most common feeling: '+esc(top.toLowerCase())+'.':'')+'</p>';
+  h+='<div class="card"><h3>What I\u2019m noticing</h3><p class="sub">'+P.length+' moments noticed. '+ch+' times I chose something from Pause & Choose.'+(P.length>=3?' Most common feeling: '+esc(top.toLowerCase())+'.':'')+'</p>';
   P.slice(0,5).forEach(function(x){h+='<div class="log"><b>'+esc(x.f)+'</b> \u2192 '+(x.ty==='chose'?'chose: '+esc(x.c):'ate for comfort, and noticed it')+(x.n?'<br><span class="sub">'+esc(x.n)+'</span>':'')+'</div>'});
   h+='</div>';
  }
@@ -264,22 +273,29 @@ function vReframe(){
  return h;
 }
 function vJourney(){
- var n=dayNum(),h='<div class="card"><h2>75-day view</h2><p class="sub">Anyone with your private link can see and update your journey. Keep it private.</p><input type="text" id="private-link" readonly value="'+esc(location.origin+location.pathname+'?journey='+profileId)+'" aria-label="Your private Journey link"><button class="btn o" id="copy-link">Copy my private link</button><p class="sub" id="copy-status" aria-live="polite"></p>';
- if(!S.start)return h+'<p class="sub">Begin your journey on the Today tab and your days will appear here.</p></div>';
- var tot=0,g='';
- for(var i=0;i<75;i++){var d=new Date(S.start+'T00:00');d.setDate(d.getDate()+i);var k=ds(d),c=counted(k);if(c)tot++;g+='<div class="dot'+(c?' d':'')+(i+1===n?' t':'')+'" title="Day '+(i+1)+'"></div>'}
- h+='<p class="sub">Filled circle = a day that counted. Empty circles are just days, not failures.</p><div class="grid">'+g+'</div>';
- var tr={},ga=[];Object.keys(S.days).forEach(function(k){var d=S.days[k];(d.p||[]).forEach(function(x,i){if(d.c.indexOf(i)>-1)tr[x]=1;if(d.ac&&d.ac[i])ga.push(d.ac[i])})});
- h+='<div class="row" style="gap:28px"><div><div class="big">'+tot+'</div><div class="sub">days counted</div></div><div><div class="big">'+Object.keys(tr).length+'</div><div class="sub">different challenges tried</div></div>'+(ga.length>=3?'<div><div class="big">'+(ga.reduce(function(a,b){return a+b},0)/ga.length).toFixed(1)+'</div><div class="sub">average afterglow (out of 5)</div></div>':'')+'</div>';
- h+=glowViews()+'<div class="msg">'+(n>1&&tot<n-1?'Missed a few days? Nothing resets. Pick up today.':'You\u2019re building something steady.')+'</div>';
- h+='<button class="btn o" id="rst">Start over with a new date</button></div>';
+ var h='<div class="card"><h2>Journey progress</h2><p class="sub">Anyone with your private link can see and update your Journey. Keep it private.</p><input type="text" id="private-link" readonly value="'+esc(location.origin+location.pathname+'?journey='+profileId)+'" aria-label="Your private Journey link"><button class="btn o" id="copy-link">Copy my private link</button><p class="sub" id="copy-status" aria-live="polite"></p>';
+ var keys=Object.keys(S.days||{}).sort(),tot=0,tr={},ga=[],rows=[];
+ keys.forEach(function(k){var d=S.days[k],sessions=challengeSessions(d),dayCounted=counted(k);if(dayCounted)tot++;
+  sessions.forEach(function(session){var tried=[];session.p.forEach(function(x,i){if(session.c&&session.c.indexOf(i)>-1){tr[x]=1;tried.push({name:x,feel:session.ac&&session.ac[i]||0});if(session.ac&&session.ac[i])ga.push(session.ac[i])}});
+   if(tried.length)rows.push({date:k,tried:tried,mode:session.mode||S.mode})});
+ });
+ h+='<div class="row" style="gap:28px;margin-top:12px">';
+ if(tot)h+='<div><div class="big">'+tot+'</div><div class="sub">challenge days counted</div></div>';
+ if(Object.keys(tr).length)h+='<div><div class="big">'+Object.keys(tr).length+'</div><div class="sub">different challenges tried</div></div>';
+ if(ga.length>=3)h+='<div><div class="big">'+(ga.reduce(function(a,b){return a+b},0)/ga.length).toFixed(1)+'</div><div class="sub">average afterglow (out of 5)</div></div>';
+ h+='</div>';
+ h+=glowViews();
+ if(rows.length){h+='<h3 style="margin-top:18px">Challenge history</h3>';rows.sort(function(a,b){return b.date.localeCompare(a.date)}).forEach(function(row){h+='<div class="log"><b>'+esc(niceDate(row.date))+'</b>'+row.tried.map(function(x){return'<div>'+esc((row.mode==='want'?'I want to ':'I get to ')+x.name)+(x.feel?' <span class="sub">Afterglow: '+FEEL[x.feel-1]+'</span>':'')+'</div>'}).join('')+'</div>'})}
+ else h+='<p class="sub">No challenge activity saved yet. There is nothing to catch up on. Choose challenges whenever you want.</p>';
+ h+='</div>'+helpCard();
  return h;
 }
 function bind(){
 var q=function(s){return document.querySelector(s)},qa=function(s){return document.querySelectorAll(s)};
  var copyLink=q('#copy-link');if(copyLink)copyLink.onclick=async function(){var input=q('#private-link'),status=q('#copy-status');try{await navigator.clipboard.writeText(input.value);status.textContent='Private link copied.'}catch(e){input.focus();input.select();status.textContent='Select and copy your private link.'}};
- var go=q('#go');if(go)go.onclick=function(){S.start=q('#sd').value||today();save();render()};
- qa('[data-m]').forEach(function(b){b.onclick=function(){S.mode=b.dataset.m;save();render()}});
+ var opener=q('#challenge-open');if(opener)opener.onclick=function(){PICKER_OPEN=true;PICK=[];render()};
+ var cancel=q('#challenge-cancel');if(cancel)cancel.onclick=function(){PICKER_OPEN=false;PICK=[];render()};
+ var roll=q('#roll');if(roll)roll.onclick=function(){var pool=CH.concat(S.custom).slice(),picked=[];while(picked.length<3&&pool.length){picked.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0])}PICK=picked;render()}; qa('[data-m]').forEach(function(b){b.onclick=function(){S.mode=b.dataset.m;save();render()}});
  qa('[data-i]').forEach(function(b){b.onchange=function(){var d=day(today()),i=+b.dataset.i,p=d.c.indexOf(i);if(p>-1){d.c.splice(p,1);if(d.ac)delete d.ac[i]}else d.c.push(i);PB=-1;save();render()}});
  qa('[data-f]').forEach(function(b){b.onclick=function(){var d=day(today());d.f=d.f===+b.dataset.f?0:+b.dataset.f;save();render()}});
  qa('[data-h]').forEach(function(b){b.onclick=function(){S.fast.hrs=+b.dataset.h;save();render()}});
@@ -289,7 +305,6 @@ var q=function(s){return document.querySelector(s)},qa=function(s){return docume
  var r1=q('#r1');
  if(r1){var up=function(){var a=r1.value.trim(),b=q('#r2').value.trim();q('#ro').innerHTML=a?'<div class="out">I get to '+esc(a)+'.</div><div class="out">I want to '+esc(a)+(b?', because '+esc(b):'')+'.</div>':''};r1.oninput=up;q('#r2').oninput=up;
   q('#rs').onclick=function(){var a=r1.value.trim(),b=q('#r2').value.trim();if(!a)return;S.reframes.unshift('I want to '+a+(b?', because '+b:'')+'.');save();render()}}
- var rst=q('#rst');if(rst)rst.onclick=function(){if(confirm('Pick a new start date? Your ticks are kept.')){S.start=null;save();tab='today';render()}};
  qa('[data-go]').forEach(function(b){b.onclick=function(){tab=b.dataset.go;render();window.scrollTo(0,0)}});
  qa('[data-pf]').forEach(function(b){b.onclick=function(){PF=PF===b.dataset.pf?'':b.dataset.pf;MSG='';render()}});
  var pn=q('#pn');if(pn)pn.oninput=function(){NOTE=pn.value};
@@ -298,8 +313,8 @@ var q=function(s){return document.querySelector(s)},qa=function(s){return docume
  var at=q('#ate');if(at)at.onclick=function(){logPull('ate','')};
  var ed=q('#ed');if(ed)ed.onclick=function(){EDIT=!EDIT;render()};
  qa('[data-p]').forEach(function(b){b.onclick=function(){var c=CH.concat(S.custom)[+b.dataset.p],i=PICK.indexOf(c);if(i>-1)PICK.splice(i,1);else if(PICK.length<3)PICK.push(c);render()}});
- var st=q('#st');if(st)st.onclick=function(){if(PICK.length===3){var d=day(today());d.p=PICK.slice();d.c=[];PICK=[];save();render()}};
- var chb=q('#ch');if(chb)chb.onclick=function(){var d=day(today());PICK=d.p.slice();d.p=[];d.c=[];save();render()};
+ var st=q('#st');if(st)st.onclick=function(){if(PICK.length===3){var d=day(today());d.sessions=d.sessions||[];if(d.p&&d.p.length)d.sessions.push({p:d.p.slice(),c:(d.c||[]).slice(),ac:Object.assign({},d.ac||{}),mode:d.mode||S.mode});d.p=PICK.slice();d.mode=S.mode;d.c=[];d.ac={};PICK=[];PICKER_OPEN=false;save();render()}};
+ var chb=q('#ch');if(chb)chb.onclick=function(){var d=day(today());d.sessions=d.sessions||[];d.sessions.push({p:(d.p||[]).slice(),c:(d.c||[]).slice(),ac:Object.assign({},d.ac||{}),mode:d.mode||S.mode});PICK=(d.p||[]).slice();d.p=[];d.c=[];d.ac={};PICKER_OPEN=true;save();render()};
  var cub=q('#cub');if(cub)cub.onclick=function(){var v=q('#cu').value.trim();if(v){S.custom.push(v);save();render()}};
  qa('[data-a]').forEach(function(b){b.onclick=function(){var d=day(today());d.a=d.a===+b.dataset.a?0:+b.dataset.a;save();render()}});
  qa('[data-w]').forEach(function(b){b.onclick=function(){MW.w=b.dataset.w;render()}});
@@ -309,7 +324,7 @@ var q=function(s){return document.querySelector(s)},qa=function(s){return docume
  qa('[data-pm]').forEach(function(b){b.onclick=function(){tg(S.pat.m,b.dataset.pm)}});
  qa('[data-ph]').forEach(function(b){b.onclick=function(){S.pat.h=S.pat.h===b.dataset.ph?'':b.dataset.ph;save();render()}});
  var wks=q('#wks');if(wks)wks.onclick=function(){var v=q('#wk').value.trim();if(v){S.worked.unshift(v);save();render()}};
- var bsv=q('#bsv');
+ var slsave=q('#sl-save');if(slsave)slsave.onclick=function(){var learning=q('#sl-learning').value.trim(),remember=q('#sl-note').value.trim();if(!learning)return;S.sessionLearnings=S.sessionLearnings||[];S.sessionLearnings.unshift({date:today(),learning:learning,remember:remember});save();render()}; var bsv=q('#bsv');
  if(bsv){var rd=function(){return{n:q('#bn').value.trim(),w:q('#bw').value.trim(),solo:q('#bs').checked}};
   bsv.onclick=function(){var b=rd();if(!b.w){q('#bm').textContent='Add when and where first.';return}S.buddy=b;save();q('#bm').textContent='Saved. It will show on your Today tab.'};
   q('#bsd').onclick=function(){var b=rd(),t='Fancy a walk'+(b.w?' \u2013 '+b.w:'')+'? No pressure if you can\u2019t make it.';

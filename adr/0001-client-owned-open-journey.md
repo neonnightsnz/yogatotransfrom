@@ -1,0 +1,3 @@
+# Keep the Journey open-ended and client-owned
+
+The Journey is an optional, open-ended coaching support space rather than a required 75-day program. Clients choose whether to take three challenges, and a day counts when they try at least two; missed days never create failure states. Clients enter session learnings into their own Playbook in their words, while a shared private link allows its holder to view and update the Journey. Recipe discovery, shopping lists, weight and body measurements, and progress photos remain outside the app so it can focus on coaching support without becoming a meal planner, body-metric tracker or image store.
